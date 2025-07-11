@@ -46,6 +46,7 @@
             <div class="header-left logo-area">
                 <span class="header-logo-icon"><i class="fas fa-paw"></i></span>
                 <span class="header-title">پارسیان</span>
+                <button class="nav-action-btn" id="sidebar-toggle-btn" title="منو"><i class="fas fa-bars"></i></button>
             </div>
             <div class="header-center-search">
                 <div class="search-bar-global">
@@ -76,6 +77,7 @@
             <ul>
                 <li><a href="#" class="nav-link active" data-section="dashboard-main-view"><i class="fas fa-tachometer-alt"></i> داشبورد</a></li>
                 <li><a href="#" class="nav-link" data-section="reservation-list-section"><i class="fas fa-calendar-check"></i> لیست رزروها <span class="nav-badge" id="sidebar-reservation-count">0</span></a></li>
+                <li><a href="#" class="nav-link" data-section="new-reservation-section"><i class="fas fa-plus-circle"></i> ثبت رزرو جدید</a></li>
                 <li><a href="#" class="nav-link" data-section="sms-panel-section"><i class="fas fa-sms"></i> پنل پیامک</a></li>
                 <li><a href="#" class="nav-link" data-section="settings-page-section"><i class="fas fa-cog"></i> تنظیمات</a></li>
             </ul>
@@ -92,6 +94,71 @@
                         <p id="stat-active-reservations">0</p>
                     </div>
                 </div>
+            </div>
+
+            <div class="content-section" id="new-reservation-section">
+                <div class="section-header-bar">
+                    <h2><i class="fas fa-plus-circle"></i> ثبت رزرو جدید</h2>
+                </div>
+                <form id="reservation-form" class="glass-effect-card">
+                    <div class="form-group floating-label">
+                        <input type="text" id="petName" placeholder=" " required>
+                        <label for="petName"><i class="fas fa-dog"></i> نام حیوان</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="ownerName" placeholder=" " required>
+                        <label for="ownerName"><i class="fas fa-user"></i> نام صاحب</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="tel" id="phoneNumber" placeholder=" " required>
+                        <label for="phoneNumber"><i class="fas fa-phone"></i> شماره تماس</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="date" id="visitDate" placeholder=" " required>
+                        <label for="visitDate"><i class="fas fa-calendar-alt"></i> تاریخ رزرو</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="date" id="nextVisitDate" placeholder=" " required>
+                        <label for="nextVisitDate"><i class="fas fa-calendar-check"></i> تاریخ واکسن بعدی</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <select id="vaccineType" required>
+                            <option value="">-- انتخاب واکسن --</option>
+                            <option value="هاری">هاری</option>
+                            <option value="پارواویروس">پارواویروس</option>
+                            <option value="کوامبو">کوامبو</option>
+                            <option value="سایر">سایر</option>
+                        </select>
+                        <label for="vaccineType"><i class="fas fa-syringe"></i> نوع واکسن</label>
+                    </div>
+                    <div class="form-group" id="customVaccineTypeGroup" style="display: none;">
+                        <input type="text" id="customVaccineTypeInput" class="custom-input" placeholder="نام واکسن">
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="breed" placeholder=" ">
+                        <label for="breed"><i class="fas fa-paw"></i> نژاد</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="number" id="weight" placeholder=" ">
+                        <label for="weight"><i class="fas fa-weight-scale"></i> وزن (ک‌گ)</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="number" id="birthYear" placeholder=" ">
+                        <label for="birthYear"><i class="fas fa-birthday-cake"></i> سال تولد</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="number" id="price" placeholder=" ">
+                        <label for="price"><i class="fas fa-money-bill-wave"></i> قیمت (تومان)</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <textarea id="notes" placeholder=" "></textarea>
+                        <label for="notes"><i class="fas fa-comment"></i> یادداشت</label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="reset" id="reset-form-button" class="btn btn-outline-danger"><i class="fas fa-eraser"></i> پاک کردن</button>
+                        <button type="submit" id="submit-reservation-button" class="btn btn-primary"><i class="fas fa-save"></i> ثبت رزرو</button>
+                    </div>
+                </form>
             </div>
 
             <div class="content-section" id="reservation-list-section">
