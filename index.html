@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پنل رزرواسیون واکسن کلینیک پارسیان</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css ">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css ">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="glass-dark">
@@ -78,11 +78,11 @@
                 </button>
                 <div class="profile-menu-container">
                     <button class="nav-action-btn profile-avatar-btn" id="profile-toggle" title="منوی کاربر">
-                        <img src="https://via.placeholder.com/100 " alt="Avatar" id="header-avatar-img" class="header-avatar">
+                        <img src="https://via.placeholder.com/100" alt="Avatar" id="header-avatar-img" class="header-avatar">
                     </button>
                     <div class="dropdown-panel glass-effect-card" id="profile-dropdown">
                         <div class="dropdown-user-info">
-                            <img src="https://via.placeholder.com/100 " alt="Avatar" id="dropdown-avatar-img" class="dropdown-avatar-large">
+                            <img src="https://via.placeholder.com/100" alt="Avatar" id="dropdown-avatar-img" class="dropdown-avatar-large">
                             <div>
                                 <strong>ادمین</strong>
                                 <small>مدیر کلینیک</small>
@@ -327,12 +327,11 @@
                     <div class="setting-item-page">
                         <label>تم رنگی فعال:</label>
                         <select id="theme-select-page" class="custom-select-modern">
-                            <option value="glass-dark">شیشه‌ای تیره (پیش‌فرض)</option>
+                            <option value="glass-dark">شیشه‌ای تیره</option>
                             <option value="glass-light">شیشه‌ای روشن</option>
-                            <option value="neumorphic-dark">نئومورفیک تیره</option>
-                            <option value="neumorphic-light">نئومورفیک روشن</option>
-                            <option value="classic-dark">کلاسیک تیره</option>
-                            <option value="classic-light">کلاسیک روشن</option>
+                            <option value="purple-gradient-1">بنفش گرادیانت ۱ (پیش‌فرض)</option>
+                            <option value="purple-gradient-2">بنفش گرادیانت ۲</option>
+                            <option value="purple-gradient-3">بنفش گرادیانت ۳</option>
                         </select>
                     </div>
                     <div class="setting-item-page">
@@ -342,10 +341,30 @@
                             <span class="slider round"></span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="settings-page-container glass-effect-card">
+                    <h3><i class="fas fa-sms"></i> تنظیمات پیامک</h3>
+                    <div class="setting-item-page column-layout">
+                        <label>متن پیش‌فرض پیامک:</label>
+                        <textarea id="sms-template" class="custom-textarea" rows="3" placeholder="متن پیش‌فرض پیامک...">سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان</textarea>
+                    </div>
                     <div class="setting-item-page">
-                        <label>میزان بلور پس‌زمینه:</label>
-                        <input type="range" id="blur-intensity-slider-page" min="5" max="20" value="10">
-                        <span id="blur-value-display">10px</span>
+                        <label>کلید API پیامک:</label>
+                        <input type="text" id="sms-api-key" class="custom-input" placeholder="کلید API">
+                    </div>
+                    <div class="setting-item-page">
+                        <label>ارسال یادآور (روز قبل از تاریخ):</label>
+                        <select id="sms-send-before" class="custom-select-modern">
+                            <option value="1">۱ روز قبل</option>
+                            <option value="2">۲ روز قبل</option>
+                            <option value="3">۳ روز قبل</option>
+                        </select>
+                    </div>
+                    <div class="setting-item-page">
+                        <button class="btn btn-primary" id="save-sms-settings-btn">
+                            <i class="fas fa-save"></i> ذخیره تنظیمات
+                        </button>
                     </div>
                 </div>
             </section>
@@ -368,7 +387,7 @@
         </div>
         <div class="modal-body">
             <div class="profile-picture-section">
-                <img src="https://via.placeholder.com/100 " alt="عکس پروفایل" id="profile-pic-preview" class="profile-pic-preview">
+                <img src="https://via.placeholder.com/100" alt="عکس پروفایل" id="profile-pic-preview" class="profile-pic-preview">
                 <div class="profile-picture-actions">
                     <label for="profile-pic-upload" class="btn btn-primary btn-sm">
                         <i class="fas fa-upload"></i> انتخاب عکس
