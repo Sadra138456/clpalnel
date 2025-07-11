@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل رزرو کلینیک دامپزشکی پارسیان</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="page-loader">
+        <div class="loader-icon"><i class="fas fa-spinner fa-pulse"></i></div>
+        <p>در حال بارگذاری...</p>
+    </div>
+
+    <div id="login-page" class="page login-wrapper">
+        <div class="login-container glass-effect-card">
+            <div class="login-icon-area"><i class="fas fa-paw login-main-icon"></i></div>
+            <div class="login-header">
+                <h1>ورود به <span>پارسیان</span></h1>
+                <p>لطفاً نام کاربری و رمز عبور خود را وارد کنید.</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group floating-label">
+                    <input type="text" id="username" name="username" placeholder=" " required>
+                    <label for="username"><i class="fas fa-user"></i> نام کاربری</label>
+                </div>
+                <div class="form-group floating-label">
+                    <input type="password" id="password" name="password" placeholder=" " required>
+                    <label for="password"><i class="fas fa-lock"></i> رمز عبور</label>
+                    <button type="button" class="toggle-password-visibility"><i class="fas fa-eye"></i></button>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="login-button">ورود</button>
+                </div>
+            </form>
+            <div class="login-footer">
+                <p>نسخه 1.0 | <span class="footer-heart">♥</span> توسط صدرا</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-page" class="page">
+        <header class="dashboard-header">
+            <div class="header-left logo-area">
+                <span class="header-logo-icon"><i class="fas fa-paw"></i></span>
+                <span class="header-title">پارسیان</span>
+            </div>
+            <div class="header-center-search">
+                <div class="search-bar-global">
+                    <input type="text" id="global-search-input" placeholder="جستجو...">
+                    <span class="search-bar-icon"><i class="fas fa-search"></i></span>
+                </div>
+            </div>
+            <div class="header-right-actions">
+                <button class="nav-action-btn" id="theme-toggle-btn" title="تغییر تم"><i class="fas fa-adjust"></i></button>
+                <div class="profile-menu-container">
+                    <button class="nav-action-btn" id="profile-toggle"><img id="header-avatar-img" src="https://via.placeholder.com/32" alt="پروفایل"></button>
+                    <div class="dropdown-panel" id="profile-dropdown">
+                        <div class="dropdown-user-info">
+                            <img id="dropdown-avatar-img" src="https://via.placeholder.com/40" alt="آواتار">
+                            <div><strong>ادمین</strong><br><small>admin@parsian.com</small></div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="account-settings-btn">تنظیمات حساب</button>
+                        <button class="dropdown-item" id="contact-developer-dropdown">تماس با توسعه‌دهنده</button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger-item" id="logout-button">خروج</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="sidebar-nav" id="sidebar-nav">
+            <ul>
+                <li><a href="#" class="nav-link active" data-section="dashboard-main-view"><i class="fas fa-tachometer-alt"></i> داشبورد</a></li>
+                <li><a href="#" class="nav-link" data-section="reservation-list-section"><i class="fas fa-calendar-check"></i> لیست رزروها <span class="nav-badge" id="sidebar-reservation-count">0</span></a></li>
+                <li><a href="#" class="nav-link" data-section="sms-panel-section"><i class="fas fa-sms"></i> پنل پیامک</a></li>
+                <li><a href="#" class="nav-link" data-section="settings-page-section"><i class="fas fa-cog"></i> تنظیمات</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content-area" id="main-content-area">
+            <div class="content-section active-content-section" id="dashboard-main-view">
+                <div class="section-header-bar">
+                    <h2><i class="fas fa-tachometer-alt"></i> داشبورد</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card glass-effect-card">
+                        <h4>رزروهای فعال</h4>
+                        <p id="stat-active-reservations">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="reservation-list-section">
+                <div class="section-header-bar">
+                    <h2><i class="fas fa-calendar-check"></i> لیست رزروها</h2>
+                    <div class="list-view-controls">
+                        <input type="text" id="list-filter-input" placeholder="جستجو در رزروها...">
+                        <select id="list-sort-dropdown">
+                            <option value="date-desc">جدیدترین</option>
+                            <option value="date-asc">قدیمی‌ترین</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="reservation-list-grid" class="reservation-list-grid"></div>
+                <p id="no-reservations-message" style="display: none; text-align: center; color: var(--text-color-muted);">هیچ رزرو فعالی وجود ندارد.</p>
+            </div>
+
+            <div class="content-section" id="sms-panel-section">
+                <div class="section-header-bar">
+                    <h2><i class="fas fa-sms"></i> پنل پیامک</h2>
+                </div>
+                <div class="sms-panel-container glass-effect-card">
+                    <div class="form-group">
+                        <label for="sms-reservation-select">انتخاب رزرو:</label>
+                        <select id="sms-reservation-select" class="custom-select-modern">
+                            <option value="">-- انتخاب کنید --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sms-message">متن پیام:</label>
+                        <textarea id="sms-message" class="custom-textarea" placeholder="متن پیام خود را وارد کنید..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="sms-send-before">ارسال قبل از (روز):</label>
+                        <input type="number" id="sms-send-before" class="custom-input" min="1" value="1">
+                    </div>
+                    <div class="form-actions">
+                        <button id="send-sms-button" class="btn btn-primary" disabled>ارسال پیامک</button>
+                    </div>
+                    <div id="scheduled-sms-list"></div>
+                </div>
+            </div>
+
+            <div class="content-section" id="settings-page-section">
+                <div class="section-header-bar">
+                    <h2><i class="fas fa-cog"></i> تنظیمات</h2>
+                </div>
+                <div class="settings-page-container">
+                    <div class="setting-item-page">
+                        <label for="theme-select-page">انتخاب تم:</label>
+                        <select id="theme-select-page" class="custom-select-compact">
+                            <option value="purple-gradient-1">بنفش ملایم ۱</option>
+                            <option value="purple-gradient-2">بنفش ملایم ۲</option>
+                            <option value="purple-gradient-3">بنفش ملایم ۳</option>
+                        </select>
+                    </div>
+                    <div class="setting-item-page">
+                        <label>انیمیشن گرادیانت:</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="gradient-animation-toggle-page" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item-page column-layout">
+                        <label for="sms-template">قالب پیامک:</label>
+                        <textarea id="sms-template" class="custom-textarea" placeholder="متن پیش‌فرض پیامک...">سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان</textarea>
+                    </div>
+                    <div class="setting-item-page">
+                        <label for="sms-api-key">کلید API پیامک:</label>
+                        <input type="text" id="sms-api-key" class="custom-input" placeholder="کلید API...">
+                    </div>
+                    <div class="setting-item-page">
+                        <label for="sms-send-before">ارسال قبل از (روز):</label>
+                        <input type="number" id="sms-send-before" class="custom-input" min="1" value="1">
+                    </div>
+                    <div class="form-actions">
+                        <button id="save-sms-settings-btn" class="btn btn-primary">ذخیره تنظیمات</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="dashboard-footer">
+            <p>© <span id="current-year-footer"></span> کلینیک دامپزشکی پارسیان | ساخته‌شده با <span class="footer-heart">♥</span></p>
+        </footer>
+
+        <div id="account-settings-modal-overlay" class="modal-overlay">
+            <div id="account-settings-modal" class="modal glass-effect-card">
+                <div class="modal-header">
+                    <h3>تنظیمات حساب</h3>
+                    <button class="modal-close-btn" id="account-settings-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="profile-picture-section">
+                        <img id="profile-pic-preview" src="https://via.placeholder.com/80" alt="پیش‌نمایش عکس" class="profile-pic-preview">
+                        <div class="profile-picture-actions">
+                            <input type="file" id="profile-pic-upload" accept="image/*">
+                            <p>برای تغییر عکس کلیک کنید.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-danger" id="account-settings-cancel-btn">لغو</button>
+                    <button class="btn btn-primary" id="account-settings-save-btn">ذخیره</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast-container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
