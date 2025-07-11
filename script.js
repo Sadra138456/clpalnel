@@ -360,10 +360,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Form Submit
     function handleFormSubmit(event) {
         event.preventDefault();
-        if (!Form.petName.value || !Form.ownerName.value || !Form.phoneNumber.value || !Form.visitDate.value || !Form.nextVisitDate.value) {
+        // Basic required fields validation
+        if (!Form.petName.value.trim() || !Form.ownerName.value.trim() || !Form.phoneNumber.value.trim() || !Form.visitDate.value || !Form.nextVisitDate.value) {
             showToast('لطفاً همه فیلدهای ضروری را پر کنید!', 'danger');
             return;
         }
+
+        // Validate phone number (at least 7 digits, only numbers)
+        const phoneRegex = /^\d{7,}$/;
+        if (!phoneRegex.test(Form.phoneNumber.value.trim())) {
+            showToast('شماره تماس معتبر نیست!', 'danger');
+            return;
+        }
+
+        // Validate date order (nextVisitDate should be after visitDate)
+        const visitDateObj = new Date(Form.visitDate.value);
+        const nextVisitDateObj = new Date(Form.nextVisitDate.value);
+        if (nextVisitDateObj <= visitDateObj) {
+            showToast('تاریخ واکسن بعدی باید بعد از تاریخ رزرو باشد!', 'danger');
+            return;
+        }
+
+        // If "سایر" selected ensure custom input filled
+        if (Form.vaccineTypeSelect.value === 'سایر' && !Form.customVaccineTypeInput.value.trim()) {
+            showToast('لطفاً نوع واکسن را وارد کنید!', 'danger');
+            return;
+        }
+
         const newReservation = {
             id: appData.nextReservationId++,
             petName: Form.petName.value.trim(),
