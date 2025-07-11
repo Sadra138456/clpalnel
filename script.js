@@ -126,6 +126,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentActiveSection = 'dashboard-main-view';
     const APP_DATA_KEY = 'parsianClinicData_v1.0';
 
+    // Helper function to get theme names
+    function getThemeName(themeKey) {
+        const themeNames = {
+            'purple-gradient-1': 'بنفش شب',
+            'purple-gradient-2': 'آبی اقیانوس', 
+            'purple-gradient-3': 'سبز طبیعت',
+            'ocean-breeze': 'نسیم اقیانوس',
+            'sunset-glow': 'غروب طلایی',
+            'forest-green': 'جنگل سبز',
+            'glass-dark': 'شیشه‌ای تیره',
+            'glass-light': 'شیشه‌ای روشن'
+        };
+        return themeNames[themeKey] || themeKey;
+    }
+
     // Initialize App
     function initializeApp() {
         loadAppData();
@@ -477,12 +492,13 @@ document.addEventListener('DOMContentLoaded', () => {
             Header.profileDropdown.classList.remove('open'); 
         });
         Header.themeToggleBtn?.addEventListener('click', () => { 
-            const themes = ['purple-gradient-1', 'purple-gradient-2', 'purple-gradient-3'];
+            const themes = ['purple-gradient-1', 'purple-gradient-2', 'purple-gradient-3', 'ocean-breeze', 'sunset-glow', 'forest-green'];
             let currentThemeIndex = themes.indexOf(appData.settings.currentTheme);
             currentThemeIndex = (currentThemeIndex + 1) % themes.length; 
             appData.settings.currentTheme = themes[currentThemeIndex]; 
             applySettings(); 
             saveAppData(); 
+            showToast(`تم تغییر کرد: ${getThemeName(appData.settings.currentTheme)}`, 'success');
         });
         Sidebar.navLinks().forEach(link => { 
             link.addEventListener('click', (e) => { 
