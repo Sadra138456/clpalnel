@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         body: document.body,
     };
 
+    // Track currently active content section to avoid strict-mode errors
+    let currentActiveSection = null;
+
     // Auth Elements
     const Auth = {
         loginForm: document.getElementById('login-form'),

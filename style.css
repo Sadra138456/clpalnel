@@ -50,33 +50,36 @@
 }
 
 body[data-theme="purple-gradient-1"] {
-    --bg-app: linear-gradient(135deg, hsl(var(--hue-primary), 30%, 15%), hsl(var(--hue-accent), 40%, 20%));
-    --bg-card: hsla(var(--hue-primary), 25%, 20%, 0.85);
-    --bg-input: hsla(var(--hue-primary), 25%, 25%, 0.7);
-    --bg-hover: hsla(var(--hue-primary), 25%, 28%, 0.9);
-    --bg-active: hsla(var(--hue-primary), 25%, 30%, 0.95);
-    --color-primary: hsl(var(--hue-primary), 60%, 70%);
-    --color-accent: hsl(var(--hue-accent), 60%, 60%);
+    /* Vibrant soft purple → pink gradient */
+    --bg-app: linear-gradient(135deg, #7f00ff 0%, #e100ff 100%);
+    --bg-card: hsla(265, 55%, 18%, 0.85);
+    --bg-input: hsla(265, 55%, 22%, 0.7);
+    --bg-hover: hsla(265, 55%, 26%, 0.9);
+    --bg-active: hsla(265, 55%, 28%, 0.95);
+    --color-primary: #d1b3ff;
+    --color-accent: #ff9dff;
 }
 
 body[data-theme="purple-gradient-2"] {
-    --bg-app: linear-gradient(135deg, hsl(var(--hue-primary), 35%, 12%), hsl(var(--hue-accent), 45%, 18%));
-    --bg-card: hsla(var(--hue-primary), 30%, 18%, 0.85);
-    --bg-input: hsla(var(--hue-primary), 30%, 22%, 0.7);
-    --bg-hover: hsla(var(--hue-primary), 30%, 25%, 0.9);
-    --bg-active: hsla(var(--hue-primary), 30%, 27%, 0.95);
-    --color-primary: hsl(var(--hue-primary), 65%, 65%);
-    --color-accent: hsl(var(--hue-accent), 65%, 55%);
+    /* Deep indigo → electric purple */
+    --bg-app: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%);
+    --bg-card: hsla(260, 60%, 16%, 0.85);
+    --bg-input: hsla(260, 60%, 20%, 0.7);
+    --bg-hover: hsla(260, 60%, 24%, 0.9);
+    --bg-active: hsla(260, 60%, 26%, 0.95);
+    --color-primary: #bfa4ff;
+    --color-accent: #c27eff;
 }
 
 body[data-theme="purple-gradient-3"] {
-    --bg-app: linear-gradient(135deg, hsl(var(--hue-primary), 40%, 10%), hsl(var(--hue-accent), 50%, 15%));
-    --bg-card: hsla(var(--hue-primary), 35%, 16%, 0.85);
-    --bg-input: hsla(var(--hue-primary), 35%, 20%, 0.7);
-    --bg-hover: hsla(var(--hue-primary), 35%, 23%, 0.9);
-    --bg-active: hsla(var(--hue-primary), 35%, 25%, 0.95);
-    --color-primary: hsl(var(--hue-primary), 70%, 60%);
-    --color-accent: hsl(var(--hue-accent), 70%, 50%);
+    /* Dark galaxy purple → midnight violet */
+    --bg-app: linear-gradient(135deg, #20002c 0%, #6f00ff 100%);
+    --bg-card: hsla(255, 55%, 12%, 0.85);
+    --bg-input: hsla(255, 55%, 16%, 0.7);
+    --bg-hover: hsla(255, 55%, 20%, 0.9);
+    --bg-active: hsla(255, 55%, 22%, 0.95);
+    --color-primary: #a68cff;
+    --color-accent: #996dff;
 }
 
 body[data-theme^="purple-gradient-"]:not(.no-gradient-animation)::before {
@@ -224,4 +227,24 @@ input:checked + .slider { background-color: var(--color-success); border-color: 
     .login-container { max-width: 92%; padding: 1rem 0.5rem; } 
     .modal { width: 95%; padding: 1rem; } 
     .profile-picture-section { flex-direction: column; text-align: center; } 
+}
+@media (max-width: 576px) {
+    /* Ensure forms and grids fit small screens nicely */
+    .reservation-list-grid {
+        grid-template-columns: 1fr;
+    }
+    .search-bar-global input {
+        padding-right: 2.25rem;
+    }
+    .header-left.logo-area {
+        flex-grow: 1;
+        justify-content: space-between;
+    }
+    .nav-action-btn {
+        width: 36px;
+        height: 36px;
+    }
+    .login-container h1 {
+        font-size: 1.6rem;
+    }
 }
