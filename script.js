@@ -32,9 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showSignup: document.getElementById('show-signup'),
         showLogin: document.getElementById('show-login'),
         googleLoginBtn: document.getElementById('google-login-btn'),
-        githubLoginBtn: document.getElementById('github-login-btn'),
         googleSignupBtn: document.getElementById('google-signup-btn'),
-        githubSignupBtn: document.getElementById('github-signup-btn'),
         rememberMe: document.getElementById('remember-me'),
         acceptTerms: document.getElementById('accept-terms'),
         forgotPasswordLink: document.getElementById('forgot-password-link'),
@@ -190,9 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Simulate OAuth flow
         setTimeout(() => {
             const mockUserData = {
-                email: provider === 'Google' ? 'user@gmail.com' : 'user@github.com',
-                fullname: provider === 'Google' ? 'کاربر Google' : 'کاربر GitHub',
-                profilePic: `https://via.placeholder.com/100?text=${provider.charAt(0)}`,
+                email: 'user@gmail.com',
+                fullname: 'کاربر Google',
+                profilePic: 'https://via.placeholder.com/100?text=G',
                 provider: provider
             };
             
@@ -719,9 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Auth.showSignup?.addEventListener('click', () => switchAuthForm(true));
         Auth.showLogin?.addEventListener('click', () => switchAuthForm(false));
         Auth.googleLoginBtn?.addEventListener('click', () => simulateOAuthLogin('Google'));
-        Auth.githubLoginBtn?.addEventListener('click', () => simulateOAuthLogin('GitHub'));
         Auth.googleSignupBtn?.addEventListener('click', () => simulateOAuthLogin('Google'));
-        Auth.githubSignupBtn?.addEventListener('click', () => simulateOAuthLogin('GitHub'));
         Auth.rememberMe?.addEventListener('change', (e) => {
             appData.settings.rememberMe = e.target.checked;
             saveAppData();
