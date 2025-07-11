@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContentArea: document.getElementById('main-content-area'),
         activeContentSections: () => document.querySelectorAll('.content-section.active-content-section'),
         toastContainer: document.getElementById('toast-container'),
-        currentYear: document.getElementById('current-year-footer'),
+        currentYear: document.getElementById('current-year'),
         body: document.body,
     };
 
@@ -106,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scheduledList: document.getElementById('scheduled-sms-list'),
     };
 
-    let appData = {
+    let appData = {};
+    const defaultAppData = {
         reservations: [],
         nextReservationId: 1,
         settings: {
@@ -115,12 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
             sms: {
                 template: 'سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان',
                 apiKey: '',
-                sendBefore: 1,
-            },
+                sendBefore: 1, // days
+            }
         },
         user: { username: 'admin', profilePic: '' },
         isAuthenticated: false,
     };
+
+    let currentActiveSection = 'dashboard-main-view';
     const APP_DATA_KEY = 'parsianClinicData_v1.0';
 
     // Initialize App
@@ -134,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (appData.isAuthenticated) {
             UI.loginPage.style.display = 'none';
             UI.dashboardPage.classList.add('active');
-            navigateToSection('dashboard-main-view', true);
+            navigateToSection(currentActiveSection, true);
         } else {
             UI.loginPage.classList.add('active');
             UI.dashboardPage.classList.remove('active');
@@ -144,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderScheduledSMS();
         setInterval(scheduleReminders, 60000); // Check every minute
         setTimeout(() => UI.pageLoader.classList.add('hidden'), 500);
+        updateReservationOptions(); // اطمینان از رندر اولیه گزینه‌ها
     }
 
     // Load App Data
@@ -151,25 +155,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const storedData = localStorage.getItem(APP_DATA_KEY);
         if (storedData) {
             try {
-                appData = JSON.parse(storedData);
-            } catch (e) {
-                console.error('Error parsing appData:', e);
-                appData = {
-                    reservations: [],
-                    nextReservationId: 1,
-                    settings: {
-                        currentTheme: 'purple-gradient-1',
-                        gradientAnimation: true,
-                        sms: {
-                            template: 'سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان',
-                            apiKey: '',
-                            sendBefore: 1,
-                        },
-                    },
-                    user: { username: 'admin', profilePic: '' },
-                    isAuthenticated: false,
+                const parsedData = JSON.parse(storedData);
+                appData = { 
+                    ...defaultAppData, 
+                    ...parsedData,
+                    user: { ...defaultAppData.user, ...(parsedData.user || {}) },
+                    settings: { 
+                        ...defaultAppData.settings, 
+                        ...(parsedData.settings || {}),
+                        sms: { ...defaultAppData.settings.sms, ...(parsedData.settings?.sms || {}) }
+                    }
                 };
+            } catch (e) { 
+                console.error('Error parsing appData:', e); 
+                appData = defaultAppData; 
             }
+        } else { 
+            appData = defaultAppData; 
         }
         if (appData.reservations.length > 0 && appData.reservations.every(r => r.id)) {
             appData.nextReservationId = Math.max(0, ...appData.reservations.map(r => parseInt(r.id))) + 1;
@@ -177,12 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Save App Data
-    function saveAppData() {
-        localStorage.setItem(APP_DATA_KEY, JSON.stringify(appData));
-        renderReservationList();
+    function saveAppData() { 
+        localStorage.setItem(APP_DATA_KEY, JSON.stringify(appData)); 
         renderScheduledSMS();
-        updateReservationOptions();
-        updateDashboardStats();
+        updateReservationOptions(); // به‌روز کردن گزینه‌ها بعد از ذخیره
     }
 
     // Apply Theme Settings
@@ -194,16 +194,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load SMS Settings
     function loadSmsSettings() {
-        if (SettingsPage.smsTemplate) {
-            SettingsPage.smsTemplate.value = appData.settings.sms.template;
-            SettingsPage.smsApiKey.value = appData.settings.sms.apiKey;
-            SettingsPage.smsSendBefore.value = appData.settings.sms.sendBefore;
-        }
+        if (!SettingsPage.smsTemplate) return;
+        SettingsPage.smsTemplate.value = appData.settings.sms.template;
+        SettingsPage.smsApiKey.value = appData.settings.sms.apiKey;
+        SettingsPage.smsSendBefore.value = appData.settings.sms.sendBefore;
     }
 
     // Load User Profile
     function loadUserProfile() {
-        const defaultAvatar = 'https://via.placeholder.com/80';
+        const defaultAvatar = 'https://via.placeholder.com/100';
         const profilePic = appData.user.profilePic || defaultAvatar;
         if (Header.headerAvatar) Header.headerAvatar.src = profilePic;
         if (Header.dropdownAvatar) Header.dropdownAvatar.src = profilePic;
@@ -236,21 +235,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('عکس پروفایل به‌روزرسانی شد.', 'success');
             };
             reader.readAsDataURL(file);
-        } else if (file) {
-            showToast('لطفاً یک فایل عکس معتبر انتخاب کنید.', 'danger');
+        } else if (file) { 
+            showToast('لطفاً یک فایل عکس معتبر انتخاب کنید.', 'danger'); 
         }
     }
 
     // Update Current Year
     function updateCurrentYear() {
-        if (UI.currentYear) UI.currentYear.textContent = new Date().getFullYear();
+        const year = new Date().getFullYear();
+        document.querySelectorAll('#current-year, #current-year-footer').forEach(el => { 
+            if(el) el.textContent = year; 
+        });
     }
 
     // Navigate Between Sections
     function navigateToSection(sectionId, isInitialLoad = false) {
-        UI.activeContentSections().forEach(s => {
-            s.classList.remove('active-content-section');
-            s.style.display = 'none';
+        UI.activeContentSections().forEach(s => { 
+            s.classList.remove('active-content-section'); 
+            s.style.display = 'none'; 
         });
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
@@ -258,8 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => targetSection.classList.add('active-content-section'), 10);
             currentActiveSection = sectionId;
             Sidebar.navLinks().forEach(link => link.classList.toggle('active', link.dataset.section === sectionId));
-        } else {
-            navigateToSection('dashboard-main-view', true);
+        } else { 
+            navigateToSection('dashboard-main-view', true); 
         }
     }
 
@@ -332,54 +334,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update Dashboard Stats
     function updateDashboardStats() {
-        if (DashboardView.statActiveReservations) {
-            DashboardView.statActiveReservations.textContent = appData.reservations.length;
+        if (DashboardView.statActiveReservations) { 
+            DashboardView.statActiveReservations.textContent = appData.reservations.length; 
         }
-        if (Sidebar.reservationCountBadge) {
-            Sidebar.reservationCountBadge.textContent = appData.reservations.length;
-            Sidebar.reservationCountBadge.style.display = appData.reservations.length > 0 ? 'inline-block' : 'none';
+        if (Sidebar.reservationCountBadge) { 
+            Sidebar.reservationCountBadge.textContent = appData.reservations.length; 
+            Sidebar.reservationCountBadge.style.display = appData.reservations.length > 0 ? 'inline-block' : 'none'; 
         }
-    }
-
-    // Update Reservation Options
-    function updateReservationOptions() {
-        if (!SMS.reservationSelect) return;
-        SMS.reservationSelect.innerHTML = '<option value="">-- انتخاب کنید --</option>';
-        appData.reservations.forEach((res, index) => {
-            if (res.reminderSent || !res.nextVisitDate || !res.phoneNumber) return;
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = `${res.petName} - ${new Date(res.nextVisitDate).toLocaleDateString('fa-IR')}`;
-            SMS.reservationSelect.appendChild(option);
-        });
     }
 
     // Handle Form Submit
     function handleFormSubmit(event) {
         event.preventDefault();
-        if (!Form.petName.value || !Form.ownerName.value || !Form.phoneNumber.value || !Form.visitDate.value || !Form.nextVisitDate.value) {
-            showToast('لطفاً همه فیلدهای ضروری را پر کنید!', 'danger');
-            return;
-        }
         const newReservation = {
             id: appData.nextReservationId++,
-            petName: Form.petName.value.trim(),
+            petName: Form.petName.value.trim(), 
             ownerName: Form.ownerName.value.trim(),
-            phoneNumber: Form.phoneNumber.value.trim(),
+            phoneNumber: Form.phoneNumber.value.trim(), 
             visitDate: Form.visitDate.value,
             nextVisitDate: Form.nextVisitDate.value,
             vaccineType: Form.vaccineTypeSelect.value === 'سایر' ? Form.customVaccineTypeInput.value.trim() : Form.vaccineTypeSelect.value,
-            notes: Form.notes.value.trim(),
-            breed: Form.breed?.value.trim(),
+            notes: Form.notes.value.trim(), 
+            createdAt: new Date().toISOString(),
+            breed: Form.breed?.value.trim(), 
             weight: Form.weight?.value,
-            birthYear: Form.birthYear?.value,
+            birthYear: Form.birthYear?.value, 
             price: Form.price?.value,
             reminderSent: false,
         };
         appData.reservations.push(newReservation);
-        saveAppData();
+        saveAppData(); 
+        renderReservationList(); 
+        updateDashboardStats(); 
         Form.reservationForm.reset();
-        Form.customVaccineTypeGroup.style.display = 'none';
+        Form.customVaccineTypeGroup.style.display = 'none'; 
         showToast('رزرو با موفقیت ثبت شد!', 'success');
         navigateToSection('reservation-list-section');
     }
@@ -387,17 +375,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Login
     function handleLogin(event) {
         event.preventDefault();
-        if (Auth.username.value === 'admin' && Auth.password.value === 'admin123') {
-            appData.isAuthenticated = true;
-            saveAppData();
-            UI.loginPage.classList.remove('active');
-            UI.dashboardPage.classList.add('active');
-            setTimeout(() => UI.loginPage.style.display = 'none', 500);
-            navigateToSection('dashboard-main-view', true);
-            showToast('ورود با موفقیت انجام شد!', 'success');
-        } else {
-            showToast('نام کاربری یا رمز عبور نادرست است!', 'danger');
-        }
+        appData.isAuthenticated = true; 
+        saveAppData();
+        UI.loginPage.classList.remove('active'); 
+        UI.dashboardPage.classList.add('active');
+        setTimeout(() => UI.loginPage.style.display = 'none', 500);
+        navigateToSection('dashboard-main-view', true);
+        showToast('ورود با موفقیت انجام شد!', 'success');
     }
 
     // Show Toast Messages
@@ -406,12 +390,12 @@ document.addEventListener('DOMContentLoaded', () => {
         toast.className = `toast toast-${type}`;
         const iconClass = type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-times-circle' : 'fa-info-circle';
         toast.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`;
-        if (UI.toastContainer) {
+        if(UI.toastContainer) {
             UI.toastContainer.appendChild(toast);
             requestAnimationFrame(() => { toast.classList.add('show'); });
-            setTimeout(() => {
-                toast.classList.remove('show');
-                toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+            setTimeout(() => { 
+                toast.classList.remove('show'); 
+                toast.addEventListener('transitionend', () => toast.remove(), { once: true }); 
             }, duration);
         }
     }
@@ -419,15 +403,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Schedule SMS Reminders
     function scheduleReminders() {
         const now = new Date();
+        const { template, apiKey, sendBefore } = appData.settings.sms;
         appData.reservations.forEach(res => {
             if (!res.nextVisitDate || res.reminderSent || !res.phoneNumber) return;
             const nextVisitDate = new Date(res.nextVisitDate);
-            const reminderTime = new Date(nextVisitDate.setDate(nextVisitDate.getDate() - appData.settings.sms.sendBefore));
+            const reminderTime = new Date(nextVisitDate.setDate(nextVisitDate.getDate() - sendBefore));
             if (now >= reminderTime && !res.reminderSent) {
-                const message = appData.settings.sms.template
+                const message = template
                     .replace('[نام حیوان]', res.petName)
                     .replace('[تاریخ]', new Date(res.nextVisitDate).toLocaleDateString('fa-IR'));
                 console.log(`Simulating SMS to ${res.phoneNumber}: ${message}`);
+                if (apiKey) {
+                    console.log("API Key is present, would send SMS now.");
+                }
                 showToast(`یادآور واکسن برای ${res.petName} ارسال شد.`, 'success');
                 res.reminderSent = true;
                 saveAppData();
@@ -437,108 +425,125 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Setup Event Listeners
     function setupEventListeners() {
-        Auth.loginForm.addEventListener('submit', handleLogin);
-        Auth.logoutButton.addEventListener('click', () => {
-            appData.isAuthenticated = false;
-            saveAppData();
-            window.location.reload();
+        Auth.loginForm?.addEventListener('submit', handleLogin);
+        Auth.logoutButton?.addEventListener('click', () => { 
+            appData.isAuthenticated = false; 
+            saveAppData(); 
+            window.location.reload(); 
         });
-        Auth.togglePassword.addEventListener('click', () => {
-            const isPasswordVisible = Auth.password.type === 'text';
-            Auth.password.type = isPasswordVisible ? 'password' : 'text';
-            Auth.togglePassword.querySelector('i').classList.toggle('fa-eye-slash');
+        Auth.togglePassword?.addEventListener('click', () => { 
+            const isPasswordVisible = Auth.password.type === 'text'; 
+            Auth.password.type = isPasswordVisible ? 'password' : 'text'; 
+            Auth.togglePassword.querySelector('i').classList.toggle('fa-eye-slash'); 
         });
-        Header.sidebarToggleBtn.addEventListener('click', () => {
-            Sidebar.nav.classList.toggle('open');
+        Header.sidebarToggleBtn?.addEventListener('click', () => { 
+            Sidebar.nav.classList.toggle('open'); 
         });
-        UI.mainContentArea.addEventListener('click', (e) => {
-            if (Sidebar.nav.classList.contains('open') && !Sidebar.nav.contains(e.target) && !Header.sidebarToggleBtn.contains(e.target)) {
-                Sidebar.nav.classList.remove('open');
-            }
+        UI.mainContentArea?.addEventListener('click', (e) => { 
+            if (Sidebar.nav.classList.contains('open') && !Sidebar.nav.contains(e.target) && !Header.sidebarToggleBtn.contains(e.target)) { 
+                Sidebar.nav.classList.remove('open'); 
+            } 
         });
-        Header.profileToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            Header.profileDropdown.classList.toggle('open');
+        Header.profileToggleBtn?.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            Header.profileDropdown.classList.toggle('open'); 
         });
-        document.addEventListener('click', (e) => {
-            if (Header.profileDropdown && !Header.profileDropdown.contains(e.target) && !Header.profileToggleBtn.contains(e.target)) {
-                Header.profileDropdown.classList.remove('open');
-            }
+        document.addEventListener('click', (e) => { 
+            if (Header.profileDropdown && !Header.profileDropdown.contains(e.target) && !Header.profileToggleBtn.contains(e.target)) { 
+                Header.profileDropdown.classList.remove('open'); 
+            } 
         });
-        Header.contactDeveloperDropdown.addEventListener('click', () => {
-            showToast('توسعه‌دهنده: صدرا | 09307398501', 'info', 6000);
-            Header.profileDropdown.classList.remove('open');
+        Header.contactDeveloperDropdown?.addEventListener('click', () => { 
+            showToast('توسعه‌دهنده: صدرا | 09307398501', 'info', 6000); 
+            Header.profileDropdown.classList.remove('open'); 
         });
-        Header.themeToggleBtn.addEventListener('click', () => {
+        Header.themeToggleBtn?.addEventListener('click', () => { 
             const themes = ['purple-gradient-1', 'purple-gradient-2', 'purple-gradient-3'];
             let currentThemeIndex = themes.indexOf(appData.settings.currentTheme);
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            appData.settings.currentTheme = themes[currentThemeIndex];
-            applySettings();
-            saveAppData();
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length; 
+            appData.settings.currentTheme = themes[currentThemeIndex]; 
+            applySettings(); 
+            saveAppData(); 
         });
-        Sidebar.navLinks().forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                navigateToSection(link.dataset.section);
-                if (window.innerWidth < 992) Sidebar.nav.classList.remove('open');
-            });
+        Sidebar.navLinks().forEach(link => { 
+            link.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                navigateToSection(link.dataset.section); 
+                if (window.innerWidth < 992) Sidebar.nav.classList.remove('open'); 
+            }); 
         });
-        Form.reservationForm.addEventListener('submit', handleFormSubmit);
-        Form.resetFormButton.addEventListener('click', () => {
-            Form.reservationForm.reset();
-            Form.customVaccineTypeGroup.style.display = 'none';
-            showToast('فرم پاک شد.', 'info');
+        Form.reservationForm?.addEventListener('submit', handleFormSubmit);
+        Form.resetFormButton?.addEventListener('click', () => { 
+            Form.reservationForm.reset(); 
+            Form.customVaccineTypeGroup.style.display = 'none'; 
+            showToast('فرم پاک شد.', 'info'); 
         });
-        Form.vaccineTypeSelect.addEventListener('change', () => {
-            const isOther = Form.vaccineTypeSelect.value === 'سایر';
-            Form.customVaccineTypeGroup.style.display = isOther ? 'flex' : 'none';
-            Form.customVaccineTypeInput.required = isOther;
+        Form.vaccineTypeSelect?.addEventListener('change', () => { 
+            const isOther = Form.vaccineTypeSelect.value === 'سایر'; 
+            Form.customVaccineTypeGroup.style.display = isOther ? 'flex' : 'none'; 
+            Form.customVaccineTypeInput.required = isOther; 
         });
-        ReservationList.container.addEventListener('click', (e) => {
-            const targetButton = e.target.closest('.btn-delete-reservation');
-            if (!targetButton) return;
-            const reservationId = parseInt(targetButton.dataset.id);
-            if (confirm(`آیا از حذف رزرو #${reservationId} مطمئن هستید؟`)) {
-                appData.reservations = appData.reservations.filter(r => r.id !== reservationId);
-                saveAppData();
-                renderReservationList();
-                updateDashboardStats();
-                showToast(`رزرو #${reservationId} حذف شد.`, 'info');
-            }
+        ReservationList.container?.addEventListener('click', (e) => { 
+            const targetButton = e.target.closest('.btn-delete-reservation'); 
+            if (!targetButton) return; 
+            const reservationId = parseInt(targetButton.dataset.id); 
+            if (confirm(`آیا از حذف رزرو #${reservationId} مطمئن هستید؟`)) { 
+                appData.reservations = appData.reservations.filter(r => r.id !== reservationId); 
+                saveAppData(); 
+                renderReservationList(); 
+                updateDashboardStats(); 
+                showToast(`رزرو #${reservationId} حذف شد.`, 'info'); 
+            } 
         });
-        SettingsPage.themeSelect.addEventListener('change', (e) => {
-            appData.settings.currentTheme = e.target.value;
-            applySettings();
-            saveAppData();
+        SettingsPage.themeSelect?.addEventListener('change', (e) => { 
+            appData.settings.currentTheme = e.target.value; 
+            applySettings(); 
+            saveAppData(); 
         });
-        SettingsPage.gradientToggle.addEventListener('change', (e) => {
-            appData.settings.gradientAnimation = e.target.checked;
-            applySettings();
-            saveAppData();
+        SettingsPage.gradientToggle?.addEventListener('change', (e) => { 
+            appData.settings.gradientAnimation = e.target.checked; 
+            applySettings(); 
+            saveAppData(); 
         });
-        SettingsPage.saveSmsSettingsBtn.addEventListener('click', () => {
+        SettingsPage.saveSmsSettingsBtn?.addEventListener('click', () => {
             appData.settings.sms.template = SettingsPage.smsTemplate.value;
             appData.settings.sms.apiKey = SettingsPage.smsApiKey.value;
             appData.settings.sms.sendBefore = parseInt(SettingsPage.smsSendBefore.value) || 1;
             saveAppData();
             showToast('تنظیمات پیامک ذخیره شد.', 'success');
         });
-        Header.accountSettingsBtn.addEventListener('click', openAccountSettingsModal);
-        AccountSettingsModal.closeBtn.addEventListener('click', closeAccountSettingsModal);
-        AccountSettingsModal.cancelBtn.addEventListener('click', closeAccountSettingsModal);
-        AccountSettingsModal.overlay.addEventListener('click', closeAccountSettingsModal);
-        AccountSettingsModal.profilePicUpload.addEventListener('change', handleProfilePicChange);
-        AccountSettingsModal.saveBtn.addEventListener('click', () => {
-            showToast('تغییرات ذخیره شد!', 'success');
-            closeAccountSettingsModal();
+        Header.accountSettingsBtn?.addEventListener('click', openAccountSettingsModal);
+        AccountSettingsModal.closeBtn?.addEventListener('click', closeAccountSettingsModal);
+        AccountSettingsModal.cancelBtn?.addEventListener('click', closeAccountSettingsModal);
+        AccountSettingsModal.overlay?.addEventListener('click', closeAccountSettingsModal);
+        AccountSettingsModal.profilePicUpload?.addEventListener('change', handleProfilePicChange);
+        AccountSettingsModal.saveBtn?.addEventListener('click', () => { 
+            showToast('تغییرات ذخیره شد!', 'success'); 
+            closeAccountSettingsModal(); 
         });
+
+        // مدیریت ارسال پیامک
+        function updateReservationOptions() {
+            SMS.reservationSelect.innerHTML = '<option value="">-- انتخاب کنید --</option>';
+            if (appData.reservations.length === 0) {
+                console.log('No reservations available to display.');
+                return;
+            }
+            appData.reservations.forEach((res, index) => {
+                if (res.reminderSent) return; // فقط رزروهایی که هنوز پیامک ارسال‌نشده
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${res.petName} - ${new Date(res.nextVisitDate).toLocaleDateString('fa-IR')}`;
+                SMS.reservationSelect.appendChild(option);
+            });
+            console.log('Reservation options updated:', SMS.reservationSelect.innerHTML);
+        }
 
         SMS.reservationSelect.addEventListener('change', () => {
             const index = SMS.reservationSelect.value;
             if (index !== '') {
                 const res = appData.reservations[index];
-                SMS.message.value = `سلام ${res.ownerName}، رزرو ${res.petName} برای تاریخ ${new Date(res.nextVisitDate).toLocaleDateString('fa-IR')} ثبت شده است.`;
+                SMS.message.value = `سلام ${res.ownerName}، رزرو ${res.petName} برای تاریخ ${new Date(res.nextVisitDate).toLocaleDateString('fa-IR')} ثبت شده است.`; // متن اولیه
                 SMS.sendButton.disabled = false;
             } else {
                 SMS.message.value = '';
@@ -547,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         SMS.sendBefore.addEventListener('change', (e) => {
-            appData.settings.sms.sendBefore = parseInt(e.target.value) || 1;
+            appData.settings.sms.sendBefore = parseInt(e.target.value);
             saveAppData();
             renderScheduledSMS();
         });
@@ -558,6 +563,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = appData.reservations[index];
                 const message = SMS.message.value.trim();
                 console.log(`Simulating SMS to ${res.phoneNumber}: ${message}`);
+                if (appData.settings.sms.apiKey) {
+                    console.log("API Key is present, would send SMS now.");
+                }
                 showToast(`پیامک برای ${res.petName} ارسال شد! (شبیه‌سازی)`, 'success');
                 res.reminderSent = true;
                 saveAppData();
@@ -568,8 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('لطفاً متن پیام را وارد کنید!', 'danger');
             }
         });
-
-        updateReservationOptions(); // Initial update
     }
 
     // Initialize App
