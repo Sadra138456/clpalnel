@@ -423,6 +423,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Update Reservation Options for SMS Panel
+    function updateReservationOptions() {
+        if (!SMS.reservationSelect) return;
+        SMS.reservationSelect.innerHTML = '<option value="">-- انتخاب کنید --</option>';
+        if (appData.reservations.length === 0) {
+            console.log('No reservations available to display.');
+            return;
+        }
+        appData.reservations.forEach((res, index) => {
+            if (res.reminderSent || !res.nextVisitDate) return; // فقط رزروهایی که هنوز پیامک ارسال‌نشده و تاریخ بعدی دارند
+            const option = document.createElement('option');
+            option.value = index;
+            const nextDate = new Date(res.nextVisitDate).toLocaleDateString('fa-IR-u-nu-latn');
+            option.textContent = `${res.petName} (${res.ownerName}) - ${nextDate}`;
+            SMS.reservationSelect.appendChild(option);
+        });
+        console.log('Reservation options updated successfully');
+    }
+
     // Setup Event Listeners
     function setupEventListeners() {
         Auth.loginForm?.addEventListener('submit', handleLogin);
@@ -522,60 +541,52 @@ document.addEventListener('DOMContentLoaded', () => {
             closeAccountSettingsModal(); 
         });
 
-        // مدیریت ارسال پیامک
-        function updateReservationOptions() {
-            SMS.reservationSelect.innerHTML = '<option value="">-- انتخاب کنید --</option>';
-            if (appData.reservations.length === 0) {
-                console.log('No reservations available to display.');
-                return;
-            }
-            appData.reservations.forEach((res, index) => {
-                if (res.reminderSent) return; // فقط رزروهایی که هنوز پیامک ارسال‌نشده
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${res.petName} - ${new Date(res.nextVisitDate).toLocaleDateString('fa-IR')}`;
-                SMS.reservationSelect.appendChild(option);
+        if (SMS.reservationSelect) {
+            SMS.reservationSelect.addEventListener('change', () => {
+                const index = SMS.reservationSelect.value;
+                if (index !== '' && appData.reservations[index]) {
+                    const res = appData.reservations[index];
+                    const nextDate = new Date(res.nextVisitDate).toLocaleDateString('fa-IR-u-nu-latn');
+                    SMS.message.value = `سلام ${res.ownerName}، یادآوری واکسن ${res.petName} برای تاریخ ${nextDate}. کلینیک پارسیان`;
+                    SMS.sendButton.disabled = false;
+                } else {
+                    SMS.message.value = '';
+                    SMS.sendButton.disabled = true;
+                }
             });
-            console.log('Reservation options updated:', SMS.reservationSelect.innerHTML);
         }
 
-        SMS.reservationSelect.addEventListener('change', () => {
-            const index = SMS.reservationSelect.value;
-            if (index !== '') {
-                const res = appData.reservations[index];
-                SMS.message.value = `سلام ${res.ownerName}، رزرو ${res.petName} برای تاریخ ${new Date(res.nextVisitDate).toLocaleDateString('fa-IR')} ثبت شده است.`; // متن اولیه
-                SMS.sendButton.disabled = false;
-            } else {
-                SMS.message.value = '';
-                SMS.sendButton.disabled = true;
-            }
-        });
-
-        SMS.sendBefore.addEventListener('change', (e) => {
-            appData.settings.sms.sendBefore = parseInt(e.target.value);
-            saveAppData();
-            renderScheduledSMS();
-        });
-
-        SMS.sendButton.addEventListener('click', () => {
-            const index = SMS.reservationSelect.value;
-            if (index !== '' && SMS.message.value.trim()) {
-                const res = appData.reservations[index];
-                const message = SMS.message.value.trim();
-                console.log(`Simulating SMS to ${res.phoneNumber}: ${message}`);
-                if (appData.settings.sms.apiKey) {
-                    console.log("API Key is present, would send SMS now.");
-                }
-                showToast(`پیامک برای ${res.petName} ارسال شد! (شبیه‌سازی)`, 'success');
-                res.reminderSent = true;
+        if (SMS.sendBefore) {
+            SMS.sendBefore.addEventListener('change', (e) => {
+                appData.settings.sms.sendBefore = parseInt(e.target.value);
                 saveAppData();
-                SMS.sendButton.disabled = true;
-                updateReservationOptions();
                 renderScheduledSMS();
-            } else {
-                showToast('لطفاً متن پیام را وارد کنید!', 'danger');
-            }
-        });
+            });
+        }
+
+        if (SMS.sendButton) {
+            SMS.sendButton.addEventListener('click', () => {
+                const index = SMS.reservationSelect.value;
+                if (index !== '' && SMS.message.value.trim() && appData.reservations[index]) {
+                    const res = appData.reservations[index];
+                    const message = SMS.message.value.trim();
+                    console.log(`Simulating SMS to ${res.phoneNumber}: ${message}`);
+                    if (appData.settings.sms.apiKey) {
+                        console.log("API Key is present, would send SMS now.");
+                    }
+                    showToast(`پیامک برای ${res.petName} ارسال شد! (شبیه‌سازی)`, 'success');
+                    res.reminderSent = true;
+                    saveAppData();
+                    SMS.reservationSelect.value = '';
+                    SMS.message.value = '';
+                    SMS.sendButton.disabled = true;
+                    updateReservationOptions();
+                    renderScheduledSMS();
+                } else {
+                    showToast('لطفاً رزرو و متن پیام را انتخاب کنید!', 'danger');
+                }
+            });
+        }
     }
 
     // Initialize App
