@@ -19,36 +19,137 @@
     <div id="login-page" class="page active">
         <div class="login-wrapper">
             <div class="login-container glass-effect-card advanced-glass-effect">
-                <div class="login-header">
-                    <div class="login-icon-area">
-                        <i class="fas fa-paw login-main-icon"></i>
+                <!-- Login Form -->
+                <div id="login-form-container" class="auth-form-container active">
+                    <div class="login-header">
+                        <div class="login-icon-area">
+                            <i class="fas fa-paw login-main-icon"></i>
+                        </div>
+                        <h1>کلینیک دامپزشکی <span>پارسیان</span></h1>
+                        <p>مدیریت هوشمند رزرواسیون واکسن</p>
                     </div>
-                    <h1>کلینیک دامپزشکی <span>پارسیان</span></h1>
-                    <p>مدیریت هوشمند رزرواسیون واکسن</p>
+                    
+                    <!-- OAuth Buttons -->
+                    <div class="oauth-section">
+                        <button type="button" class="btn-oauth btn-google" id="google-login-btn">
+                            <i class="fab fa-google"></i> ورود با Google
+                        </button>
+                        <button type="button" class="btn-oauth btn-github" id="github-login-btn">
+                            <i class="fab fa-github"></i> ورود با GitHub
+                        </button>
+                    </div>
+                    
+                    <div class="divider-section">
+                        <span class="divider-text">یا با ایمیل وارد شوید</span>
+                    </div>
+                    
+                    <form id="login-form" class="login-form-modern">
+                        <div class="form-group">
+                            <div class="floating-label advanced-label">
+                                <input type="email" id="username" placeholder="ایمیل" required autocomplete="email">
+                                <label for="username"><i class="fas fa-envelope"></i> ایمیل</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="floating-label advanced-label">
+                                <input type="password" id="password" placeholder="رمز عبور" required autocomplete="current-password">
+                                <label for="password"><i class="fas fa-lock"></i> رمز عبور</label>
+                                <button type="button" class="toggle-password-visibility" title="نمایش/مخفی کردن رمز">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="remember-checkbox">
+                                <input type="checkbox" id="remember-me">
+                                <span class="checkmark"></span>
+                                مرا به خاطر بسپار
+                            </label>
+                            <a href="#" class="forgot-password-link" id="forgot-password-link">فراموشی رمز؟</a>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-shine btn-advanced-login" id="login-button">
+                            <i class="fas fa-sign-in-alt"></i> ورود به پنل
+                        </button>
+                    </form>
+                    
+                    <div class="login-footer">
+                        <p>حساب کاربری ندارید؟ <a href="#" class="switch-form-link" id="show-signup">ثبت نام کنید</a></p>
+                        <p class="login-footer-text">طراحی و توسعه توسط صدرا</p>
+                    </div>
                 </div>
-                <form id="login-form" class="login-form-modern">
-                    <div class="form-group">
-                        <div class="floating-label advanced-label">
-                            <input type="text" id="username" placeholder="نام کاربری" required autocomplete="off">
-                            <label for="username"><i class="fas fa-user"></i> نام کاربری</label>
+
+                <!-- Signup Form -->
+                <div id="signup-form-container" class="auth-form-container">
+                    <div class="login-header">
+                        <div class="login-icon-area signup-icon">
+                            <i class="fas fa-user-plus login-main-icon"></i>
                         </div>
+                        <h1>ایجاد حساب <span>جدید</span></h1>
+                        <p>به جمع ما بپیوندید</p>
                     </div>
-                    <div class="form-group">
-                        <div class="floating-label advanced-label">
-                            <input type="password" id="password" placeholder="رمز عبور" required autocomplete="off">
-                            <label for="password"><i class="fas fa-lock"></i> رمز عبور</label>
-                            <button type="button" class="toggle-password-visibility" title="نمایش/مخفی کردن رمز">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                    
+                    <!-- OAuth Buttons -->
+                    <div class="oauth-section">
+                        <button type="button" class="btn-oauth btn-google" id="google-signup-btn">
+                            <i class="fab fa-google"></i> ثبت نام با Google
+                        </button>
+                        <button type="button" class="btn-oauth btn-github" id="github-signup-btn">
+                            <i class="fab fa-github"></i> ثبت نام با GitHub
+                        </button>
+                    </div>
+                    
+                    <div class="divider-section">
+                        <span class="divider-text">یا با ایمیل ثبت نام کنید</span>
+                    </div>
+                    
+                    <form id="signup-form" class="login-form-modern">
+                        <div class="form-group">
+                            <div class="floating-label advanced-label">
+                                <input type="text" id="signup-fullname" placeholder="نام و نام خانوادگی" required autocomplete="name">
+                                <label for="signup-fullname"><i class="fas fa-user"></i> نام و نام خانوادگی</label>
+                            </div>
                         </div>
+                        <div class="form-group">
+                            <div class="floating-label advanced-label">
+                                <input type="email" id="signup-email" placeholder="ایمیل" required autocomplete="email">
+                                <label for="signup-email"><i class="fas fa-envelope"></i> ایمیل</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="floating-label advanced-label">
+                                <input type="password" id="signup-password" placeholder="رمز عبور" required autocomplete="new-password">
+                                <label for="signup-password"><i class="fas fa-lock"></i> رمز عبور</label>
+                                <button type="button" class="toggle-password-visibility" title="نمایش/مخفی کردن رمز">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="floating-label advanced-label">
+                                <input type="password" id="signup-confirm-password" placeholder="تکرار رمز عبور" required autocomplete="new-password">
+                                <label for="signup-confirm-password"><i class="fas fa-check-double"></i> تکرار رمز عبور</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="remember-checkbox">
+                                <input type="checkbox" id="accept-terms" required>
+                                <span class="checkmark"></span>
+                                <a href="#" class="terms-link">شرایط و قوانین</a> را می‌پذیرم
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-shine btn-advanced-login" id="signup-button">
+                            <i class="fas fa-user-plus"></i> ایجاد حساب کاربری
+                        </button>
+                    </form>
+                    
+                    <div class="login-footer">
+                        <p>قبلاً ثبت نام کرده‌اید؟ <a href="#" class="switch-form-link" id="show-login">وارد شوید</a></p>
+                        <p class="login-footer-text">طراحی و توسعه توسط صدرا</p>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-shine btn-advanced-login" id="login-button">
-                        <i class="fas fa-sign-in-alt"></i> ورود به پنل
-                    </button>
-                </form>
-                <div class="login-footer">
-                    <p>فراموشی رمز عبور؟ <a href="#" class="forgot-password-link">بازیابی</a></p>
-                    <p class="login-footer-text">طراحی و توسعه توسط صدرا</p>
                 </div>
             </div>
         </div>
@@ -295,8 +396,32 @@
         <button type="button" class="btn btn-primary" id="send-sms-button" disabled>
           <i class="fas fa-paper-plane"></i> ارسال پیامک
         </button>
+        <button type="button" class="btn btn-outline-primary" id="show-sms-archive-btn">
+          <i class="fas fa-archive"></i> آرشیو پیامک‌ها
+        </button>
       </div>
     </div>
+    
+    <!-- SMS Archive Section -->
+    <div class="sms-archive-section" id="sms-archive-section" style="display: none;">
+      <div class="archive-header">
+        <h3><i class="fas fa-archive"></i> آرشیو پیامک‌های ارسالی</h3>
+        <button class="btn btn-sm btn-outline-danger" id="clear-archive-btn">
+          <i class="fas fa-trash"></i> پاک کردن آرشیو
+        </button>
+      </div>
+      <div class="archive-search">
+        <input type="text" id="archive-search-input" class="form-control-compact" placeholder="جستجو در آرشیو...">
+        <select id="archive-filter" class="custom-select-compact">
+          <option value="all">همه پیامک‌ها</option>
+          <option value="today">امروز</option>
+          <option value="week">هفته گذشته</option>
+          <option value="month">ماه گذشته</option>
+        </select>
+      </div>
+      <div id="sms-archive-list" class="archive-list"></div>
+    </div>
+    
     <div class="sms-scheduled-list" id="scheduled-sms-list"></div>
   </div>
 </section>
@@ -329,12 +454,12 @@
                         <select id="theme-select-page" class="custom-select-modern">
                             <option value="glass-dark">شیشه‌ای تیره</option>
                             <option value="glass-light">شیشه‌ای روشن</option>
-                            <option value="purple-gradient-1">بنفش شب (پیش‌فرض)</option>
-                            <option value="purple-gradient-2">آبی اقیانوس</option>
-                            <option value="purple-gradient-3">سبز طبیعت</option>
-                            <option value="ocean-breeze">نسیم اقیانوس</option>
-                            <option value="sunset-glow">غروب طلایی</option>
-                            <option value="forest-green">جنگل سبز</option>
+                            <option value="purple-gradient-1">بنفش مرموز (پیش‌فرض)</option>
+                            <option value="purple-gradient-2">آبی شاهانه</option>
+                            <option value="purple-gradient-3">بنفش درخشان</option>
+                            <option value="amethyst-dream">رویای آمتیست</option>
+                            <option value="lavender-mist">مه اسطوخودوس</option>
+                            <option value="royal-purple">بنفش سلطنتی</option>
                         </select>
                     </div>
                     <div class="setting-item-page">
