@@ -185,7 +185,7 @@ body[data-theme^="glass-"]:not(.no-gradient-animation)::before { content: ''; po
 .nav-action-btn { background: transparent; border: none; font-size: 1.1rem; border-radius: 50%; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; }
 .header-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color-soft); }
 .profile-menu-container { position: relative; }
-.dropdown-panel { position: absolute; top: calc(100% + 8px); right: 0; width: 250px; z-index: 1000; padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all var(--transition-duration-medium) ease; max-height: 80vh; overflow-y: auto; }
+.dropdown-panel { position: absolute; top: calc(100% + 8px); left: auto; right: 0; width: 250px; z-index: 1000; padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all var(--transition-duration-medium) ease; max-height: 80vh; overflow-y: auto; }
 .dropdown-panel.open { opacity: 1; visibility: visible; transform: translateY(0); }
 .dropdown-user-info { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color-soft); }
 .dropdown-avatar-large { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color-medium); flex-shrink: 0; }
@@ -260,7 +260,8 @@ input:checked + .slider { background-color: var(--color-success); border-color: 
     .sidebar-nav { width: 240px; box-shadow: var(--shadow-lg); } 
     .sidebar-nav.open { transform: translateX(-240px); } 
     .modern-form .col-md-6 { flex-basis: 100%; } 
-    .dropdown-panel { width: 220px; right: -20px; }
+    .dropdown-panel { width: 220px; right: 0; }
+    .reservation-info-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) { 
     .dashboard-header { flex-wrap: wrap; height: auto; gap: 0.5rem; padding: 0.5rem 1rem; } 
@@ -271,7 +272,8 @@ input:checked + .slider { background-color: var(--color-success); border-color: 
     .reservation-list-grid { grid-template-columns: 1fr; }
     .list-view-controls { flex-direction: column; gap: 0.5rem; }
     .list-view-controls input, .list-view-controls select { width: 100%; }
-    .dropdown-panel { width: 200px; right: -10px; }
+    .dropdown-panel { width: 200px; right: 0; }
+    .modern-form .col-md-8, .modern-form .col-md-4 { flex-basis: 100%; }
 }
 @media (max-width: 480px) { 
     .login-container { max-width: 92%; padding: 1rem 0.5rem; } 
@@ -280,8 +282,9 @@ input:checked + .slider { background-color: var(--color-success); border-color: 
     .form-card-padding { padding: 1rem; }
     .main-content-area { padding: 0.75rem; }
     .section-header-bar { flex-direction: column; gap: 0.5rem; text-align: center; }
-    .dropdown-panel { width: 180px; right: 0; }
+    .dropdown-panel { width: 95vw; right: 0; left: 5px; }
     .reservation-card-details { grid-template-columns: 1fr; }
+    .reservation-info-grid { grid-template-columns: 1fr; }
 }
 
 /* SMS Panel Styles */
@@ -329,6 +332,62 @@ input:checked + .slider { background-color: var(--color-success); border-color: 
 .sms-actions {
     display: flex;
     justify-content: flex-end;
+}
+.reservation-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+.reservation-info-grid div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.text-muted {
+    color: var(--text-color-muted);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+.form-control {
+    width: 100%;
+    font-size: 0.95rem;
+    background-color: var(--bg-input);
+    color: var(--text-color-base);
+    border: 1px solid var(--border-color-soft);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    height: 48px;
+    transition: all var(--transition-duration-fast) ease;
+}
+.form-control:focus {
+    border-color: var(--border-color-focus);
+    box-shadow: 0 0 0 3px hsla(var(--hue-accent), 70%, 55%, 0.1);
+}
+.btn-success {
+    background-color: var(--color-success);
+    color: white;
+    border-color: var(--color-success);
+}
+.btn-success:hover {
+    background-color: hsl(var(--hue-success), 55%, 50%);
+    transform: translateY(-2px);
+}
+.btn-outline-secondary {
+    color: var(--text-color-muted);
+    border-color: var(--border-color-medium);
+    background-color: transparent;
+}
+.btn-outline-secondary:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-color-base);
+}
+.sms-scheduled-section h4 {
+    color: var(--text-color-base);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .empty-list-placeholder {
     text-align: center;

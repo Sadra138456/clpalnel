@@ -260,9 +260,43 @@
 <!-- SMS Panel Section (بخش به‌روزرسانی‌شده) -->
 <section id="sms-panel-section" class="content-section">
   <div class="section-header-bar">
-    <h2><i class="fas fa-sms"></i> ارسال پیامک خودکار</h2>
+    <h2><i class="fas fa-sms"></i> مدیریت ارسال پیامک</h2>
   </div>
+  
+  <!-- تنظیمات پیامک -->
+  <div class="glass-effect-card form-card-padding" style="margin-bottom: 1.5rem;">
+    <h3><i class="fas fa-cog"></i> تنظیمات پیامک</h3>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label class="static-label"><i class="fas fa-key"></i> کلید API پیامک</label>
+        <input type="text" id="sms-api-key" class="form-control" placeholder="کلید API خود را وارد کنید">
+      </div>
+      <div class="form-group col-md-6">
+        <label class="static-label"><i class="fas fa-clock"></i> زمان پیش‌فرض ارسال</label>
+        <select id="sms-default-send-before" class="custom-select-modern">
+          <option value="1">۱ روز قبل</option>
+          <option value="2">۲ روز قبل</option>
+          <option value="3">۳ روز قبل</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <label class="static-label"><i class="fas fa-edit"></i> متن پیش‌فرض پیامک</label>
+        <textarea id="sms-template" class="custom-textarea" rows="3" placeholder="متن پیش‌فرض پیامک...">سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان</textarea>
+        <small class="text-muted">می‌توانید از [نام حیوان] و [تاریخ] برای جایگذاری خودکار استفاده کنید</small>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-success" id="save-sms-settings-btn">
+        <i class="fas fa-save"></i> ذخیره تنظیمات
+      </button>
+    </div>
+  </div>
+
+  <!-- ارسال پیامک -->
   <div class="glass-effect-card form-card-padding">
+    <h3><i class="fas fa-paper-plane"></i> ارسال پیامک</h3>
     <div class="sms-panel-container">
       <div class="form-row">
         <div class="form-group col-md-12">
@@ -272,32 +306,48 @@
           </select>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-md-12">
-          <label class="static-label"><i class="fas fa-sms"></i> متن پیام (اجباری)</label>
-          <div class="floating-label">
-            <textarea id="sms-message" class="custom-textarea" placeholder="متن پیام خود را وارد کنید..." required></textarea>
-            <span class="validation-indicator-static"></span>
-          </div>
+      
+      <!-- اطلاعات رزرو انتخاب شده -->
+      <div id="selected-reservation-info" class="glass-effect-card" style="margin: 1rem 0; padding: 1rem; display: none; background: var(--bg-input);">
+        <h4><i class="fas fa-info-circle"></i> اطلاعات رزرو انتخاب شده</h4>
+        <div class="reservation-info-grid">
+          <div><strong>نام حیوان:</strong> <span id="info-pet-name">-</span></div>
+          <div><strong>صاحب:</strong> <span id="info-owner-name">-</span></div>
+          <div><strong>شماره تماس:</strong> <span id="info-phone">-</span></div>
+          <div><strong>تاریخ مراجعه بعدی:</strong> <span id="info-next-date">-</span></div>
         </div>
       </div>
+      
       <div class="form-row">
-        <div class="form-group col-md-12">
-          <label class="static-label"><i class="fas fa-clock"></i> زمان ارسال (قبل از تاریخ مراجعه)</label>
+        <div class="form-group col-md-8">
+          <label class="static-label"><i class="fas fa-sms"></i> متن پیام</label>
+          <textarea id="sms-message" class="custom-textarea" placeholder="متن پیام خود را وارد کنید..." required rows="4"></textarea>
+        </div>
+        <div class="form-group col-md-4">
+          <label class="static-label"><i class="fas fa-clock"></i> زمان ارسال</label>
           <select id="sms-send-before" class="custom-select-modern">
-            <option value="1">1 روز قبل</option>
-            <option value="2">2 روز قبل</option>
-            <option value="3">3 روز قبل</option>
+            <option value="0">هم‌اکنون</option>
+            <option value="1">۱ روز قبل از مراجعه</option>
+            <option value="2">۲ روز قبل از مراجعه</option>
+            <option value="3">۳ روز قبل از مراجعه</option>
           </select>
         </div>
       </div>
       <div class="form-actions">
+        <button type="button" class="btn btn-outline-secondary" id="use-template-btn">
+          <i class="fas fa-copy"></i> استفاده از متن پیش‌فرض
+        </button>
         <button type="button" class="btn btn-primary" id="send-sms-button" disabled>
           <i class="fas fa-paper-plane"></i> ارسال پیامک
         </button>
       </div>
     </div>
-    <div class="sms-scheduled-list" id="scheduled-sms-list"></div>
+    
+    <!-- لیست پیامک‌های برنامه‌ریزی شده -->
+    <div class="sms-scheduled-section" style="margin-top: 2rem;">
+      <h4><i class="fas fa-calendar-alt"></i> پیامک‌های برنامه‌ریزی شده</h4>
+      <div class="sms-scheduled-list" id="scheduled-sms-list"></div>
+    </div>
   </div>
 </section>
             <!-- Reservation List -->
@@ -340,31 +390,6 @@
                             <input type="checkbox" id="gradient-animation-toggle-page" checked>
                             <span class="slider round"></span>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="settings-page-container glass-effect-card">
-                    <h3><i class="fas fa-sms"></i> تنظیمات پیامک</h3>
-                    <div class="setting-item-page column-layout">
-                        <label>متن پیش‌فرض پیامک:</label>
-                        <textarea id="sms-template" class="custom-textarea" rows="3" placeholder="متن پیش‌فرض پیامک...">سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان</textarea>
-                    </div>
-                    <div class="setting-item-page">
-                        <label>کلید API پیامک:</label>
-                        <input type="text" id="sms-api-key" class="custom-input" placeholder="کلید API">
-                    </div>
-                    <div class="setting-item-page">
-                        <label>ارسال یادآور (روز قبل از تاریخ):</label>
-                        <select id="sms-send-before" class="custom-select-modern">
-                            <option value="1">۱ روز قبل</option>
-                            <option value="2">۲ روز قبل</option>
-                            <option value="3">۳ روز قبل</option>
-                        </select>
-                    </div>
-                    <div class="setting-item-page">
-                        <button class="btn btn-primary" id="save-sms-settings-btn">
-                            <i class="fas fa-save"></i> ذخیره تنظیمات
-                        </button>
                     </div>
                 </div>
             </section>
