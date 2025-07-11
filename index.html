@@ -392,6 +392,31 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="settings-page-container glass-effect-card">
+                    <h3><i class="fas fa-sms"></i> تنظیمات پیامک</h3>
+                    <div class="setting-item-page column-layout">
+                        <label>متن پیش‌فرض پیامک:</label>
+                        <textarea id="sms-template-settings" class="custom-textarea" rows="3" placeholder="متن پیش‌فرض پیامک...">سلام، یادآور واکسن [نام حیوان] شما در تاریخ [تاریخ] می باشد. کلینیک پارسیان</textarea>
+                    </div>
+                    <div class="setting-item-page">
+                        <label>کلید API پیامک:</label>
+                        <input type="text" id="sms-api-key-settings" class="custom-input" placeholder="کلید API">
+                    </div>
+                    <div class="setting-item-page">
+                        <label>ارسال یادآور (روز قبل از تاریخ):</label>
+                        <select id="sms-send-before-settings" class="custom-select-modern">
+                            <option value="1">۱ روز قبل</option>
+                            <option value="2">۲ روز قبل</option>
+                            <option value="3">۳ روز قبل</option>
+                        </select>
+                    </div>
+                    <div class="setting-item-page">
+                        <button class="btn btn-primary" id="save-sms-settings-page-btn">
+                            <i class="fas fa-save"></i> ذخیره تنظیمات
+                        </button>
+                    </div>
+                </div>
             </section>
         </main>
 

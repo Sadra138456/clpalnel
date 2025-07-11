@@ -185,7 +185,7 @@ body[data-theme^="glass-"]:not(.no-gradient-animation)::before { content: ''; po
 .nav-action-btn { background: transparent; border: none; font-size: 1.1rem; border-radius: 50%; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; }
 .header-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color-soft); }
 .profile-menu-container { position: relative; }
-.dropdown-panel { position: absolute; top: calc(100% + 8px); left: auto; right: 0; width: 250px; z-index: 1000; padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all var(--transition-duration-medium) ease; max-height: 80vh; overflow-y: auto; }
+.dropdown-panel { position: absolute; top: calc(100% + 8px); right: 0; width: 250px; z-index: 1000; padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all var(--transition-duration-medium) ease; max-height: 80vh; overflow-y: auto; }
 .dropdown-panel.open { opacity: 1; visibility: visible; transform: translateY(0); }
 .dropdown-user-info { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color-soft); }
 .dropdown-avatar-large { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color-medium); flex-shrink: 0; }
@@ -282,7 +282,7 @@ input:checked + .slider { background-color: var(--color-success); border-color: 
     .form-card-padding { padding: 1rem; }
     .main-content-area { padding: 0.75rem; }
     .section-header-bar { flex-direction: column; gap: 0.5rem; text-align: center; }
-    .dropdown-panel { width: 95vw; right: 0; left: 5px; }
+    .dropdown-panel { width: 200px; right: -20px; }
     .reservation-card-details { grid-template-columns: 1fr; }
     .reservation-info-grid { grid-template-columns: 1fr; }
 }

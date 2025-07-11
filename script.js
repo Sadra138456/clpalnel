@@ -80,6 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const SettingsPage = {
         themeSelect: document.getElementById('theme-select-page'),
         gradientToggle: document.getElementById('gradient-animation-toggle-page'),
+        smsTemplate: document.getElementById('sms-template-settings'),
+        smsApiKey: document.getElementById('sms-api-key-settings'),
+        smsSendBefore: document.getElementById('sms-send-before-settings'),
+        saveSmsSettingsBtn: document.getElementById('save-sms-settings-page-btn'),
     };
 
     // Account Settings Modal Elements
@@ -199,9 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load SMS Settings
     function loadSmsSettings() {
+        // Load in SMS Panel
         if (SMS.template) SMS.template.value = appData.settings.sms.template;
         if (SMS.apiKey) SMS.apiKey.value = appData.settings.sms.apiKey;
         if (SMS.defaultSendBefore) SMS.defaultSendBefore.value = appData.settings.sms.sendBefore;
+        
+        // Load in Settings Page
+        if (SettingsPage.smsTemplate) SettingsPage.smsTemplate.value = appData.settings.sms.template;
+        if (SettingsPage.smsApiKey) SettingsPage.smsApiKey.value = appData.settings.sms.apiKey;
+        if (SettingsPage.smsSendBefore) SettingsPage.smsSendBefore.value = appData.settings.sms.sendBefore;
     }
 
     // Load User Profile
@@ -483,13 +493,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Save SMS Settings
+    // Save SMS Settings (from SMS Panel)
     function saveSmsSettings() {
         if (SMS.template) appData.settings.sms.template = SMS.template.value;
         if (SMS.apiKey) appData.settings.sms.apiKey = SMS.apiKey.value;
         if (SMS.defaultSendBefore) appData.settings.sms.sendBefore = parseInt(SMS.defaultSendBefore.value) || 1;
         
         saveAppData();
+        loadSmsSettings(); // Sync with settings page
+        showToast('تنظیمات پیامک ذخیره شد.', 'success');
+    }
+
+    // Save SMS Settings (from Settings Page)
+    function saveSmsSettingsPage() {
+        if (SettingsPage.smsTemplate) appData.settings.sms.template = SettingsPage.smsTemplate.value;
+        if (SettingsPage.smsApiKey) appData.settings.sms.apiKey = SettingsPage.smsApiKey.value;
+        if (SettingsPage.smsSendBefore) appData.settings.sms.sendBefore = parseInt(SettingsPage.smsSendBefore.value) || 1;
+        
+        saveAppData();
+        loadSmsSettings(); // Sync with SMS panel
         showToast('تنظیمات پیامک ذخیره شد.', 'success');
     }
 
@@ -575,6 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applySettings(); 
             saveAppData(); 
         });
+        SettingsPage.saveSmsSettingsBtn?.addEventListener('click', saveSmsSettingsPage);
 
         Header.accountSettingsBtn?.addEventListener('click', openAccountSettingsModal);
         AccountSettingsModal.closeBtn?.addEventListener('click', closeAccountSettingsModal);
