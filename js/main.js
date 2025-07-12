@@ -23,16 +23,55 @@ async function apiRequest(url, options = {}) {
     };
 
     try {
+        console.log('🚀 API Request:', API_BASE + url, config);
+        
         const response = await fetch(API_BASE + url, config);
-        const data = await response.json();
+        
+        console.log('📡 Response Status:', response.status, response.statusText);
+        console.log('📋 Response Headers:', [...response.headers.entries()]);
+        
+        // Get response text first to debug
+        const responseText = await response.text();
+        console.log('📝 Raw Response:', responseText);
+        
+        // Try to parse JSON
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (jsonError) {
+            console.error('❌ JSON Parse Error:', jsonError);
+            console.error('📄 Response Text:', responseText);
+            
+            // Show helpful error message
+            if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+                throw new Error('سرور پاسخ HTML برمی‌گرداند! احتمالاً مشکل در API path یا کانفیگ سرور است.');
+            } else if (responseText.trim() === '') {
+                throw new Error('سرور پاسخ خالی برمی‌گرداند! بررسی کنید که API فایل‌ها درست آپلود شده باشند.');
+            } else {
+                throw new Error('پاسخ سرور JSON معتبر نیست: ' + responseText.substring(0, 200));
+            }
+        }
         
         if (!response.ok) {
-            throw new Error(data.error || 'Request failed');
+            throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
         }
         
         return data;
     } catch (error) {
-        console.error('API Error:', error);
+        console.error('💥 API Error:', error);
+        
+        // Show debug info to user in development
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('test')) {
+            showNotification(`Debug: ${error.message}`, 'error');
+        } else {
+            // Show user-friendly message in production
+            if (error.message.includes('Failed to fetch')) {
+                showNotification('مشکل در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
+            } else {
+                showNotification(error.message, 'error');
+            }
+        }
+        
         throw error;
     }
 }

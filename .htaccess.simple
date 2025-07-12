@@ -1,0 +1,19 @@
+# Simple .htaccess for shared hosting
+RewriteEngine On
+
+# API Routes - Simple version
+RewriteRule ^api/auth/(.*)$ api/auth.php [QSA,L]
+RewriteRule ^api/reservations/(.*)$ api/reservations.php [QSA,L]
+RewriteRule ^api/sms/(.*)$ api/sms.php [QSA,L]
+
+# Everything else goes to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ index.php [L]
+
+# Security
+Options -Indexes
+
+# PHP Error Display (for debugging)
+php_flag display_errors on
+php_value error_reporting "E_ALL"
