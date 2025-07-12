@@ -12,7 +12,7 @@ function setAuthHeader(headers = {}) {
     return headers;
 }
 
-// Make API request
+// Make API request with better error handling
 async function apiRequest(url, options = {}) {
     const config = {
         headers: {
@@ -28,11 +28,15 @@ async function apiRequest(url, options = {}) {
         const response = await fetch(API_BASE + url, config);
         
         console.log('📡 Response Status:', response.status, response.statusText);
-        console.log('📋 Response Headers:', [...response.headers.entries()]);
         
         // Get response text first to debug
         const responseText = await response.text();
         console.log('📝 Raw Response:', responseText);
+        
+        // Check if response is empty
+        if (!responseText || responseText.trim() === '') {
+            throw new Error('سرور پاسخ خالی برمی‌گرداند. احتمالاً مشکل در تنظیمات دیتابیس است.');
+        }
         
         // Try to parse JSON
         let data;
@@ -45,8 +49,8 @@ async function apiRequest(url, options = {}) {
             // Show helpful error message
             if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
                 throw new Error('سرور پاسخ HTML برمی‌گرداند! احتمالاً مشکل در API path یا کانفیگ سرور است.');
-            } else if (responseText.trim() === '') {
-                throw new Error('سرور پاسخ خالی برمی‌گرداند! بررسی کنید که API فایل‌ها درست آپلود شده باشند.');
+            } else if (responseText.includes('Connection Error') || responseText.includes('database')) {
+                throw new Error('مشکل در اتصال به دیتابیس. لطفاً تنظیمات دیتابیس را بررسی کنید.');
             } else {
                 throw new Error('پاسخ سرور JSON معتبر نیست: ' + responseText.substring(0, 200));
             }
@@ -60,17 +64,8 @@ async function apiRequest(url, options = {}) {
     } catch (error) {
         console.error('💥 API Error:', error);
         
-        // Show debug info to user in development
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('test')) {
-            showNotification(`Debug: ${error.message}`, 'error');
-        } else {
-            // Show user-friendly message in production
-            if (error.message.includes('Failed to fetch')) {
-                showNotification('مشکل در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید.', 'error');
-            } else {
-                showNotification(error.message, 'error');
-            }
-        }
+        // Show debug info to user
+        showNotification(error.message, 'error');
         
         throw error;
     }
@@ -115,6 +110,7 @@ function showNotification(message, type = 'success') {
         border-radius: 5px;
         z-index: 10000;
         font-family: Vazirmatn, sans-serif;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     `;
     
     document.body.appendChild(notification);
@@ -228,14 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const dropdown = document.getElementById('userDropdown');
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
-    
-    // Close user menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.user-menu')) {
-            document.getElementById('userDropdown').style.display = 'none';
-        }
-    });
-    
 });
 
 // Verify token
@@ -244,6 +232,7 @@ async function verifyToken() {
         const response = await apiRequest('/auth/verify-token');
         showDashboard(response.user);
     } catch (error) {
+        console.error('Token verification failed:', error);
         logout();
     }
 }
@@ -251,10 +240,13 @@ async function verifyToken() {
 // Show dashboard
 function showDashboard(user) {
     document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'block';
     
     // Update user info
     document.getElementById('userName').textContent = user.first_name + ' ' + user.last_name;
+    if (user.avatar) {
+        document.getElementById('userAvatar').src = user.avatar;
+    }
     
     // Load dashboard data
     loadDashboardData();
@@ -263,19 +255,24 @@ function showDashboard(user) {
 // Load dashboard data
 async function loadDashboardData() {
     try {
-        // Load reservations stats
-        const reservationsResponse = await apiRequest('/reservations/statistics');
+        // Load real data from API
+        const response = await apiRequest('/reservations/stats');
         
-        document.getElementById('totalReservations').textContent = reservationsResponse.total_reservations;
-        document.getElementById('pendingReservations').textContent = reservationsResponse.pending_count;
-        document.getElementById('confirmedReservations').textContent = reservationsResponse.confirmed_count;
+        document.getElementById('totalReservations').textContent = response.total || '0';
+        document.getElementById('pendingReservations').textContent = response.pending || '0';
+        document.getElementById('confirmedReservations').textContent = response.confirmed || '0';
+        document.getElementById('totalSMS').textContent = response.sms_count || '0';
         
-        // Load SMS stats
-        const smsResponse = await apiRequest('/sms/statistics');
-        document.getElementById('totalSMS').textContent = smsResponse.total_messages;
-        
+        showNotification('داشبورد بارگذاری شد!', 'success');
     } catch (error) {
         console.error('Error loading dashboard data:', error);
+        // Show default values if API fails
+        document.getElementById('totalReservations').textContent = '0';
+        document.getElementById('pendingReservations').textContent = '0';
+        document.getElementById('confirmedReservations').textContent = '0';
+        document.getElementById('totalSMS').textContent = '0';
+        
+        showNotification('خطا در بارگذاری اطلاعات داشبورد', 'error');
     }
 }
 
@@ -286,6 +283,10 @@ function logout() {
     
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('loginPage').style.display = 'block';
+    
+    // Reset forms
+    document.getElementById('loginFormElement').reset();
+    document.getElementById('signupFormElement').reset();
     
     showNotification('خروج موفقیت‌آمیز بود!');
 }

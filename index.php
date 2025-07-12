@@ -1,3 +1,15 @@
+<?php
+// Check if this is an API request
+if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
+    // API requests should be handled by .htaccess routing
+    // This file should not be reached for API calls
+    http_response_code(404);
+    echo json_encode(['error' => 'API endpoint not found']);
+    exit;
+}
+
+// For non-API requests, serve the HTML file
+?>
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -8,7 +20,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- OAuth disabled for now -->
+    <!-- <script src="https://accounts.google.com/gsi/client" async defer></script> -->
 </head>
 <body>
     <!-- Login/Register Page -->
@@ -41,14 +54,14 @@
                         <button type="submit" class="btn-primary">ورود</button>
                     </form>
                     
-                    <div class="divider">یا</div>
-                    
+                    <!-- OAuth disabled -->
+                    <!-- <div class="divider">یا</div>
                     <div class="oauth-buttons">
                         <div id="googleSignInButton" class="btn-oauth google">
                             <span class="oauth-icon">G</span>
                             <span>ورود با Google</span>
                         </div>
-                    </div>
+                    </div> -->
                     
                     <div class="form-footer">
                         <p>حساب کاربری ندارید؟ <a href="#" id="showSignup">ثبت نام</a></p>
@@ -86,14 +99,14 @@
                         <button type="submit" class="btn-primary">ثبت نام</button>
                     </form>
                     
-                    <div class="divider">یا</div>
-                    
+                    <!-- OAuth disabled -->
+                    <!-- <div class="divider">یا</div>
                     <div class="oauth-buttons">
                         <div id="googleSignUpButton" class="btn-oauth google">
                             <span class="oauth-icon">G</span>
                             <span>ثبت نام با Google</span>
                         </div>
-                    </div>
+                    </div> -->
                     
                     <div class="form-footer">
                         <p>حساب کاربری دارید؟ <a href="#" id="showLogin">ورود</a></p>
