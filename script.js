@@ -13,14 +13,29 @@ document.addEventListener('DOMContentLoaded', () => {
         body: document.body,
     };
 
-    // Auth Elements
+    // Auth Elements (Updated)
     const Auth = {
         loginForm: document.getElementById('login-form'),
+        signupForm: document.getElementById('signup-form'),
+        loginFormContainer: document.getElementById('login-form-container'),
+        signupFormContainer: document.getElementById('signup-form-container'),
         username: document.getElementById('username'),
         password: document.getElementById('password'),
+        signupFullname: document.getElementById('signup-fullname'),
+        signupEmail: document.getElementById('signup-email'),
+        signupPassword: document.getElementById('signup-password'),
+        signupConfirmPassword: document.getElementById('signup-confirm-password'),
         loginButton: document.getElementById('login-button'),
+        signupButton: document.getElementById('signup-button'),
         logoutButton: document.getElementById('logout-button'),
-        togglePassword: document.querySelector('.toggle-password-visibility'),
+        togglePassword: document.querySelectorAll('.toggle-password-visibility'),
+        showSignup: document.getElementById('show-signup'),
+        showLogin: document.getElementById('show-login'),
+        googleLoginBtn: document.getElementById('google-login-btn'),
+        googleSignupBtn: document.getElementById('google-signup-btn'),
+        rememberMe: document.getElementById('remember-me'),
+        acceptTerms: document.getElementById('accept-terms'),
+        forgotPasswordLink: document.getElementById('forgot-password-link'),
     };
 
     // Header Elements
@@ -97,19 +112,29 @@ document.addEventListener('DOMContentLoaded', () => {
         profilePicPreview: document.getElementById('profile-pic-preview'),
     };
 
-    // SMS Elements
+    // SMS Elements (Updated)
     const SMS = {
         reservationSelect: document.getElementById('sms-reservation-select'),
         message: document.getElementById('sms-message'),
         sendBefore: document.getElementById('sms-send-before'),
         sendButton: document.getElementById('send-sms-button'),
         scheduledList: document.getElementById('scheduled-sms-list'),
+        showArchiveBtn: document.getElementById('show-sms-archive-btn'),
+        archiveSection: document.getElementById('sms-archive-section'),
+        archiveList: document.getElementById('sms-archive-list'),
+        archiveSearchInput: document.getElementById('archive-search-input'),
+        archiveFilter: document.getElementById('archive-filter'),
+        clearArchiveBtn: document.getElementById('clear-archive-btn'),
     };
 
     let appData = {};
     const defaultAppData = {
         reservations: [],
         nextReservationId: 1,
+        smsArchive: [], // New SMS archive array
+        users: [
+            { id: 1, email: 'admin@parsian.com', password: 'admin123', fullname: 'مدیر کلینیک', role: 'admin' }
+        ],
         settings: {
             currentTheme: 'purple-gradient-1',
             gradientAnimation: true,
@@ -119,12 +144,262 @@ document.addEventListener('DOMContentLoaded', () => {
                 sendBefore: 1, // days
             }
         },
-        user: { username: 'admin', profilePic: '' },
+        user: { username: 'admin', profilePic: '', email: 'admin@parsian.com', fullname: 'مدیر کلینیک' },
         isAuthenticated: false,
     };
 
     let currentActiveSection = 'dashboard-main-view';
     const APP_DATA_KEY = 'parsianClinicData_v1.0';
+
+    // Helper function to get theme names (Updated)
+    function getThemeName(themeKey) {
+        const themeNames = {
+            'purple-gradient-1': 'بنفش مرموز',
+            'purple-gradient-2': 'آبی شاهانه', 
+            'purple-gradient-3': 'بنفش درخشان',
+            'amethyst-dream': 'رویای آمتیست',
+            'lavender-mist': 'مه اسطوخودوس',
+            'royal-purple': 'بنفش سلطنتی',
+            'glass-dark': 'شیشه‌ای تیره',
+            'glass-light': 'شیشه‌ای روشن'
+        };
+        return themeNames[themeKey] || themeKey;
+    }
+
+    // Switch between login and signup forms
+    function switchAuthForm(showSignup = false) {
+        if (showSignup) {
+            Auth.loginFormContainer.classList.remove('active');
+            setTimeout(() => {
+                Auth.signupFormContainer.classList.add('active');
+            }, 200);
+        } else {
+            Auth.signupFormContainer.classList.remove('active');
+            setTimeout(() => {
+                Auth.loginFormContainer.classList.add('active');
+            }, 200);
+        }
+    }
+
+    // OAuth Login Simulation
+    function simulateOAuthLogin(provider) {
+        showToast(`در حال اتصال به ${provider}...`, 'info');
+        
+        // Simulate OAuth flow
+        setTimeout(() => {
+            const mockUserData = {
+                email: 'user@gmail.com',
+                fullname: 'کاربر Google',
+                profilePic: 'https://via.placeholder.com/100?text=G',
+                provider: provider
+            };
+            
+            appData.user = { ...appData.user, ...mockUserData };
+            appData.isAuthenticated = true;
+            saveAppData();
+            
+            UI.loginPage.classList.remove('active');
+            UI.dashboardPage.classList.add('active');
+            setTimeout(() => UI.loginPage.style.display = 'none', 500);
+            navigateToSection('dashboard-main-view', true);
+            loadUserProfile();
+            showToast(`ورود با ${provider} موفقیت‌آمیز بود!`, 'success');
+        }, 2000);
+    }
+
+    // Handle Signup
+    function handleSignup(event) {
+        event.preventDefault();
+        
+        const fullname = Auth.signupFullname.value.trim();
+        const email = Auth.signupEmail.value.trim();
+        const password = Auth.signupPassword.value;
+        const confirmPassword = Auth.signupConfirmPassword.value;
+        
+        // Validation
+        if (password !== confirmPassword) {
+            showToast('رمزهای عبور مطابقت ندارند!', 'danger');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showToast('رمز عبور باید حداقل ۶ کاراکتر باشد!', 'danger');
+            return;
+        }
+        
+        // Check if user already exists
+        const existingUser = appData.users.find(u => u.email === email);
+        if (existingUser) {
+            showToast('این ایمیل قبلاً ثبت شده است!', 'danger');
+            return;
+        }
+        
+        // Create new user
+        const newUser = {
+            id: Date.now(),
+            email: email,
+            password: password, // In real app, this should be hashed
+            fullname: fullname,
+            role: 'user',
+            createdAt: new Date().toISOString()
+        };
+        
+        appData.users.push(newUser);
+        appData.user = { 
+            username: fullname, 
+            email: email, 
+            fullname: fullname, 
+            profilePic: '' 
+        };
+        appData.isAuthenticated = true;
+        saveAppData();
+        
+        UI.loginPage.classList.remove('active');
+        UI.dashboardPage.classList.add('active');
+        setTimeout(() => UI.loginPage.style.display = 'none', 500);
+        navigateToSection('dashboard-main-view', true);
+        loadUserProfile();
+        showToast(`خوش آمدید ${fullname}!`, 'success');
+    }
+
+    // Enhanced Login Function
+    function handleLogin(event) {
+        event.preventDefault();
+        
+        const email = Auth.username.value.trim();
+        const password = Auth.password.value;
+        
+        // Check credentials
+        const user = appData.users.find(u => u.email === email && u.password === password);
+        if (!user) {
+            showToast('ایمیل یا رمز عبور اشتباه است!', 'danger');
+            return;
+        }
+        
+        appData.user = { 
+            username: user.fullname, 
+            email: user.email, 
+            fullname: user.fullname, 
+            profilePic: appData.user.profilePic || '' 
+        };
+        appData.isAuthenticated = true; 
+        saveAppData();
+        
+        UI.loginPage.classList.remove('active'); 
+        UI.dashboardPage.classList.add('active');
+        setTimeout(() => UI.loginPage.style.display = 'none', 500);
+        navigateToSection('dashboard-main-view', true);
+        loadUserProfile();
+        showToast(`خوش آمدید ${user.fullname}!`, 'success');
+    }
+
+    // SMS Archive Functions
+    function addToSMSArchive(reservation, message, phone) {
+        const archiveItem = {
+            id: Date.now(),
+            petName: reservation.petName,
+            ownerName: reservation.ownerName,
+            phone: phone,
+            message: message,
+            sentAt: new Date().toISOString(),
+            reservationId: reservation.id
+        };
+        
+        appData.smsArchive = appData.smsArchive || [];
+        appData.smsArchive.unshift(archiveItem); // Add to beginning
+        saveAppData();
+    }
+
+    function renderSMSArchive() {
+        if (!SMS.archiveList) return;
+        
+        const searchTerm = SMS.archiveSearchInput?.value.toLowerCase() || '';
+        const filter = SMS.archiveFilter?.value || 'all';
+        
+        let filteredArchive = [...(appData.smsArchive || [])];
+        
+        // Apply search filter
+        if (searchTerm) {
+            filteredArchive = filteredArchive.filter(item => 
+                item.petName.toLowerCase().includes(searchTerm) ||
+                item.ownerName.toLowerCase().includes(searchTerm) ||
+                item.message.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        // Apply date filter
+        const now = new Date();
+        if (filter !== 'all') {
+            filteredArchive = filteredArchive.filter(item => {
+                const sentDate = new Date(item.sentAt);
+                const diffTime = now - sentDate;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                switch (filter) {
+                    case 'today': return diffDays <= 1;
+                    case 'week': return diffDays <= 7;
+                    case 'month': return diffDays <= 30;
+                    default: return true;
+                }
+            });
+        }
+        
+        SMS.archiveList.innerHTML = '';
+        
+        if (filteredArchive.length === 0) {
+            SMS.archiveList.innerHTML = `
+                <div class="archive-empty">
+                    <i class="fas fa-inbox"></i>
+                    <p>هیچ پیامکی در آرشیو موجود نیست</p>
+                </div>
+            `;
+            return;
+        }
+        
+        filteredArchive.forEach(item => {
+            const sentDate = new Date(item.sentAt).toLocaleDateString('fa-IR-u-nu-latn', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const archiveItemEl = document.createElement('div');
+            archiveItemEl.className = 'archive-item';
+            archiveItemEl.innerHTML = `
+                <div class="archive-item-header">
+                    <span class="archive-item-name">${item.petName} (${item.ownerName})</span>
+                    <span class="archive-item-date">${sentDate}</span>
+                </div>
+                <div class="archive-item-phone">${item.phone}</div>
+                <div class="archive-item-message">${item.message}</div>
+            `;
+            
+            SMS.archiveList.appendChild(archiveItemEl);
+        });
+    }
+
+    function toggleSMSArchive() {
+        const isVisible = SMS.archiveSection.style.display !== 'none';
+        SMS.archiveSection.style.display = isVisible ? 'none' : 'block';
+        SMS.showArchiveBtn.innerHTML = isVisible 
+            ? '<i class="fas fa-archive"></i> آرشیو پیامک‌ها'
+            : '<i class="fas fa-eye-slash"></i> مخفی کردن آرشیو';
+        
+        if (!isVisible) {
+            renderSMSArchive();
+        }
+    }
+
+    function clearSMSArchive() {
+        if (confirm('آیا از پاک کردن کل آرشیو پیامک‌ها مطمئن هستید؟')) {
+            appData.smsArchive = [];
+            saveAppData();
+            renderSMSArchive();
+            showToast('آرشیو پیامک‌ها پاک شد', 'info');
+        }
+    }
 
     // Initialize App
     function initializeApp() {
@@ -372,18 +647,6 @@ document.addEventListener('DOMContentLoaded', () => {
         navigateToSection('reservation-list-section');
     }
 
-    // Handle Login
-    function handleLogin(event) {
-        event.preventDefault();
-        appData.isAuthenticated = true; 
-        saveAppData();
-        UI.loginPage.classList.remove('active'); 
-        UI.dashboardPage.classList.add('active');
-        setTimeout(() => UI.loginPage.style.display = 'none', 500);
-        navigateToSection('dashboard-main-view', true);
-        showToast('ورود با موفقیت انجام شد!', 'success');
-    }
-
     // Show Toast Messages
     function showToast(message, type = 'info', duration = 3500) {
         const toast = document.createElement('div');
@@ -445,16 +708,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup Event Listeners
     function setupEventListeners() {
         Auth.loginForm?.addEventListener('submit', handleLogin);
+        Auth.signupForm?.addEventListener('submit', handleSignup);
         Auth.logoutButton?.addEventListener('click', () => { 
             appData.isAuthenticated = false; 
             saveAppData(); 
             window.location.reload(); 
         });
-        Auth.togglePassword?.addEventListener('click', () => { 
-            const isPasswordVisible = Auth.password.type === 'text'; 
-            Auth.password.type = isPasswordVisible ? 'password' : 'text'; 
-            Auth.togglePassword.querySelector('i').classList.toggle('fa-eye-slash'); 
+        Auth.showSignup?.addEventListener('click', () => switchAuthForm(true));
+        Auth.showLogin?.addEventListener('click', () => switchAuthForm(false));
+        Auth.googleLoginBtn?.addEventListener('click', () => simulateOAuthLogin('Google'));
+        Auth.googleSignupBtn?.addEventListener('click', () => simulateOAuthLogin('Google'));
+        Auth.rememberMe?.addEventListener('change', (e) => {
+            appData.settings.rememberMe = e.target.checked;
+            saveAppData();
         });
+        Auth.acceptTerms?.addEventListener('change', (e) => {
+            appData.settings.acceptTerms = e.target.checked;
+            saveAppData();
+        });
+        Auth.forgotPasswordLink?.addEventListener('click', () => showToast('این قابلیت در حال توسعه است.', 'info'));
+
         Header.sidebarToggleBtn?.addEventListener('click', () => { 
             Sidebar.nav.classList.toggle('open'); 
         });
@@ -477,13 +750,23 @@ document.addEventListener('DOMContentLoaded', () => {
             Header.profileDropdown.classList.remove('open'); 
         });
         Header.themeToggleBtn?.addEventListener('click', () => { 
-            const themes = ['purple-gradient-1', 'purple-gradient-2', 'purple-gradient-3'];
+            const themes = ['purple-gradient-1', 'purple-gradient-2', 'purple-gradient-3', 'amethyst-dream', 'lavender-mist', 'royal-purple'];
             let currentThemeIndex = themes.indexOf(appData.settings.currentTheme);
             currentThemeIndex = (currentThemeIndex + 1) % themes.length; 
             appData.settings.currentTheme = themes[currentThemeIndex]; 
             applySettings(); 
             saveAppData(); 
+            showToast(`تم تغییر کرد: ${getThemeName(appData.settings.currentTheme)}`, 'success');
         });
+
+        // Fixed password toggle
+        Auth.togglePassword?.forEach(btn => btn.addEventListener('click', () => { 
+            const passwordInput = btn.previousElementSibling.previousElementSibling;
+            const isPasswordVisible = passwordInput.type === 'text'; 
+            passwordInput.type = isPasswordVisible ? 'password' : 'text'; 
+            btn.querySelector('i').classList.toggle('fa-eye-slash'); 
+        }));
+
         Sidebar.navLinks().forEach(link => { 
             link.addEventListener('click', (e) => { 
                 e.preventDefault(); 
@@ -570,11 +853,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (index !== '' && SMS.message.value.trim() && appData.reservations[index]) {
                     const res = appData.reservations[index];
                     const message = SMS.message.value.trim();
+                    
+                    // Add to archive
+                    addToSMSArchive(res, message, res.phoneNumber);
+                    
                     console.log(`Simulating SMS to ${res.phoneNumber}: ${message}`);
                     if (appData.settings.sms.apiKey) {
                         console.log("API Key is present, would send SMS now.");
                     }
-                    showToast(`پیامک برای ${res.petName} ارسال شد! (شبیه‌سازی)`, 'success');
+                    showToast(`پیامک برای ${res.petName} ارسال و در آرشیو ذخیره شد!`, 'success');
                     res.reminderSent = true;
                     saveAppData();
                     SMS.reservationSelect.value = '';
@@ -586,6 +873,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast('لطفاً رزرو و متن پیام را انتخاب کنید!', 'danger');
                 }
             });
+        }
+
+        if (SMS.showArchiveBtn) {
+            SMS.showArchiveBtn.addEventListener('click', toggleSMSArchive);
+        }
+        if (SMS.clearArchiveBtn) {
+            SMS.clearArchiveBtn.addEventListener('click', clearSMSArchive);
+        }
+        if (SMS.archiveSearchInput) {
+            SMS.archiveSearchInput.addEventListener('input', () => renderSMSArchive());
+        }
+        if (SMS.archiveFilter) {
+            SMS.archiveFilter.addEventListener('change', () => renderSMSArchive());
         }
     }
 
