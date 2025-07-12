@@ -11,10 +11,10 @@ try {
         echo json_encode([
             'status' => 'success',
             'message' => 'Database connection successful',
-            'database_info' => [
+            'database_config' => [
                 'host' => 'localhost',
-                'database' => 'sadracheraghi_clinick',
-                'user' => 'sadracheraghi_clinick_user'
+                'db_name' => 'your_database_name',
+                'username' => 'your_username'
             ]
         ]);
     } else {
