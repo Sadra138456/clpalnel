@@ -1,0 +1,24 @@
+# Protect uploads directory
+Options -Indexes
+
+# Allow only specific file types
+<FilesMatch "\.(jpg|jpeg|png|gif|pdf|doc|docx)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Deny all other file types
+<FilesMatch "\.(?!jpg|jpeg|png|gif|pdf|doc|docx).*$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent execution of PHP files
+<Files *.php>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Set security headers
+Header set X-Content-Type-Options nosniff
+Header set X-Frame-Options DENY
